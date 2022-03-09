@@ -13,9 +13,9 @@ from TP1.strategies.bppv import bppv
 #     states:Collection[State] = puzzle_solver()
 
 strategy_map: Dict[str, Callable[[State],Collection[State]]] = {
-    'BPA': bpa,
-    'BPP': bpp,
-    'BPPV': bppv
+    'BPA': bpa, #BFS
+    'BPP': bpp, #DFS
+    'BPPV': bppv #IDDFS
 }
 
 def main():
@@ -23,6 +23,7 @@ def main():
     initial_puzzle: State = create_puzzle()
 
     states: Collection[State] = puzzle_solver(initial_puzzle, 'BPA')
+
 
 def puzzle_solver(initial_puzzle: State, strategy: str )->Collection[State]:
 
