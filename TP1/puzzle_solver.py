@@ -31,9 +31,11 @@ def puzzle_solver(initial_puzzle: State, strategy: str )->Collection[State]:
         raise ValueError(f'Invalid strategy {strategy}. Valid strategies: {strategy_map.keys()}')
 
     start_time: float = perf_counter()
+    print(initial_puzzle.puzzle)
     states: Collection[State] = strategy_map[strategy](initial_puzzle)
+    print(states)
     end_time: float = perf_counter()
-
+    print(end_time)
     return states
 
 

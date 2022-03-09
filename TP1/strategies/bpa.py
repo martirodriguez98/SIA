@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Collection, Set, Deque
+from typing import Collection, Set, Deque, Iterator
 
 from TP1.node import Node
 from TP1.state import State
@@ -19,12 +19,9 @@ def bpa(init_state: State) -> Collection[State]:
         if current.puzzle_solved():
             return current.get_puzzle_solution()
 
+        not_visited: Iterator[Node] = filter(lambda node: node.state not in visited, current.children())
 
-    #   # If not visited, mark it as visited, and
-    #   # enqueue it
-    #   for neighbour in graph[vertex]:
-    #     if neighbour not in visited:
-    #       visited.add(neighbour)
-    #       queue.append(neighbour)
-
+        for node in not_visited:
+            visited.add(node.state)
+            queue.append(node)
     return []

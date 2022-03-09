@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Optional, Collection, Deque
+from typing import Optional, Collection, Deque, Iterator
 
 from TP1.state import State
 
@@ -30,3 +30,9 @@ class Node:
             current = current.parent
 
         return state_queue
+
+    def children(self) -> Iterator['Node']:
+        children_it: Iterator[State] = map(self.state.move_empty_box, self.state.get_valid_moves())
+        return map(lambda state: Node(state,self), children_it)
+
+
