@@ -17,9 +17,9 @@ class Node:
 
     def puzzle_solved(self) -> bool:
         for x in range(len(self.state.puzzle)):
-            for y in range(len(self.state.puzzle[x])):
-                if self.state.puzzle[x][y] != (3 * x + y + 1):
-                    return False
+            if self.state.puzzle[x] != (x+1) and self.state.puzzle[x] != 0:
+                return False
+        print('solved')
         return True
 
     def get_puzzle_solution(self) -> Collection[State]:
@@ -28,7 +28,6 @@ class Node:
         while current:
             state_queue.appendleft(current.state)
             current = current.parent
-
         return state_queue
 
     def children(self) -> Iterator['Node']:
@@ -37,3 +36,9 @@ class Node:
 
     def __repr__(self) -> str:
         return f'Node(state={repr(self.state)}, parent_id={id(self.parent)})'
+
+    def __eq__(self, other):
+        return self.state == other.state
+
+    def __hash__(self):
+        return hash((self.state,self.depth,self.parent))
