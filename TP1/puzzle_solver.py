@@ -33,8 +33,8 @@ def puzzle_solver(initial_puzzle: State, strategy: str )->Collection[State]:
     start_time: float = perf_counter()
     print(initial_puzzle.puzzle)
     states: Collection[State] = strategy_map[strategy](initial_puzzle)
-    print(states)
     end_time: float = perf_counter()
+    print(states)
     print(end_time)
     return states
 

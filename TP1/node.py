@@ -35,4 +35,5 @@ class Node:
         children_it: Iterator[State] = map(self.state.move_empty_box, self.state.get_valid_moves())
         return map(lambda state: Node(state,self), children_it)
 
-
+    def __repr__(self) -> str:
+        return f'Node(state={repr(self.state)}, parent_id={id(self.parent)})'
