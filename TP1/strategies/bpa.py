@@ -11,7 +11,7 @@ def bpa(init_state: State) -> Collection[State]:
     # visited: Set[State] = set()
     # visited.add(root.state)
     visited: Set[State] = set()
-    visited.add(root)
+    visited.add(root.state)
 
 
     queue: Deque[Node] = deque()
