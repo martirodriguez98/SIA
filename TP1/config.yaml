@@ -1,3 +1,5 @@
 strategy:
-  name: BPA
+  name: GREEDY
+  strategy_params:
+    heuristic: pieces_out_of_place
 #  step:

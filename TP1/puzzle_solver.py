@@ -8,6 +8,7 @@ from TP1.state import State
 from TP1.strategies.bpp import bpp
 from TP1.strategies.bpa import bpa
 from TP1.strategies.bppv import bppv
+from TP1.strategies.local_heuristic import local_heuristic
 
 
 # def main(config_file: str):
@@ -16,7 +17,8 @@ from TP1.strategies.bppv import bppv
 strategy_map: Dict[str, Callable[[State,StrategyParams],Collection[State]]] = {
     'BPA': bpa, #BFS
     'BPP': bpp, #DFS
-    'BPPV': bppv #IDDFS
+    'BPPV': bppv, #IDDFS
+    'GREEDY': local_heuristic #GREEDY
 }
 
 def main(config_file: str):
