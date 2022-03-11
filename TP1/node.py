@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Optional, Collection, Deque, Iterator
+from typing import Optional, Collection, Deque, Iterator, List
 
 from TP1.state import State
 
@@ -17,8 +17,9 @@ class Node:
 
     def puzzle_solved(self) -> bool:
         for x in range(len(self.state.puzzle)):
-            if self.state.puzzle[x] != (x+1) and self.state.puzzle[x] != 0:
-                return False
+            for y in range(len(self.state.puzzle)):
+                if self.state.puzzle[x][y] != (3*x + y + 1)  and self.state.puzzle[x][y] != 0:
+                    return False
         print('solved')
         return True
 
@@ -30,15 +31,15 @@ class Node:
             current = current.parent
         return state_queue
 
-    def children(self) -> Iterator['Node']:
-        children_it: Iterator[State] = map(self.state.move_empty_box, self.state.get_valid_moves())
-        return map(lambda state: Node(state,self), children_it)
+    def get_valid_states(self) -> List[State]:
+        return list(map(lambda pos: self.state.move_empty_box(pos), self.state.get_valid_moves()))
+
+    def children(self) -> List['Node']:
+        return list(map(lambda state: Node(state,self),self.get_valid_states()))
+
+
+
 
     def __repr__(self) -> str:
-        return f'Node(state={repr(self.state)}, parent_id={id(self.parent)})'
+        return f'Node(state={repr(self.state)}\n parent_id={id(self.parent)})'
 
-    def __eq__(self, other):
-        return self.state == other.state
-
-    def __hash__(self):
-        return hash((self.state,self.depth,self.parent))

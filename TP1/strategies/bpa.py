@@ -8,25 +8,31 @@ from TP1.state import State
 def bpa(init_state: State) -> Collection[State]:
     root = Node(init_state, None)
 
+    # visited: Set[State] = set()
+    # visited.add(root.state)
     visited: Set[State] = set()
-    visited.add(root.state)
-    not_visited: Set[Node] = set()
+    visited.add(root)
+
 
     queue: Deque[Node] = deque()
     queue.append(root)
 
     while queue:
-        print(f'Visited:')
-        print(f' {visited}')
-        print(f'Not visited: {not_visited}')
+        # print(f'Visited:')
+        # print(f' {visited}')
+
         current: Node = queue.popleft()
+
         if current.puzzle_solved():
             return current.get_puzzle_solution()
 
-        # not_visited: Iterator[Node] = filter(lambda node: node.state in visited, current.children())
-        print('children:')
-        for n in current.children():
-            print(n)
+        # not_visited: Iterator[Node] = filter(lambda node: node.state not in visited, current.children())
+        not_visited: set[Node] = set()
+
+        for node in current.children():
+            # print(node)
+            if node.state not in visited:
+                not_visited.add(node)
 
 
         for node in not_visited:

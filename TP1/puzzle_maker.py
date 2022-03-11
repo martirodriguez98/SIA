@@ -1,22 +1,21 @@
 from typing import List, Set, Tuple
-
+import random
 import numpy as np
 
 from TP1.state import State
 
+BOARD_SIZE = 3
+OBJECTIVE: State = State(
+    np.array([[1,2,3],[4,5,6],[7,8,0]],int),[2,2]
+)
 
-def create_puzzle() -> State:
+def create_puzzle(iterations: int) -> State:
 
-    list = np.random.choice(9, size=(9), replace=False)
-    random_array: Tuple = tuple(list)
-    empty_box: int = -1
+    initial_state: State = OBJECTIVE
+    state_chosen: State = initial_state
+    for _ in range(iterations):
+        possible_moves = state_chosen.get_valid_moves()
+        move_chosen = random.choice(possible_moves)
+        state_chosen = state_chosen.move_empty_box(move_chosen)
+    return state_chosen
 
-    for x in range(len(random_array)):
-        if random_array[x] == 0:
-            empty_box = x
-            break
-
-    if empty_box == -1:
-        raise ValueError('Invalid puzzle')
-
-    return State(random_array, empty_box)

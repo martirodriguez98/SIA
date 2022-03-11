@@ -20,7 +20,8 @@ strategy_map: Dict[str, Callable[[State],Collection[State]]] = {
 
 def main():
 
-    initial_puzzle: State = create_puzzle()
+    initial_puzzle: State = create_puzzle(100)
+    print(f'Puzzle to solve: {initial_puzzle}')
 
     states: Collection[State] = puzzle_solver(initial_puzzle, 'BPA')
 
@@ -34,7 +35,10 @@ def puzzle_solver(initial_puzzle: State, strategy: str )->Collection[State]:
     print(initial_puzzle.puzzle)
     states: Collection[State] = strategy_map[strategy](initial_puzzle)
     end_time: float = perf_counter()
-    print(states)
+    i=0
+    for s in states:
+        i+=1
+        print(f'pasos: {i}\n {s}')
     print(end_time)
     return states
 
