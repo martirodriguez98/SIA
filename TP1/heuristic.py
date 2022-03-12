@@ -3,7 +3,7 @@ from typing import Callable, Dict
 from TP1.state import State
 
 
-def pieces_out_of_place(state: State) -> int:
+def pieces_out_of_place() -> int:
     print('pieces')
     return 1
 

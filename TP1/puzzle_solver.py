@@ -28,7 +28,7 @@ def main(config_file: str):
     print(f'Puzzle to solve: {initial_puzzle}')
 
     states: Collection[State] = puzzle_solver(initial_puzzle, config.strategy, config.strategy_params)
-    print(states)
+    # print(states)
 
 
 def puzzle_solver(initial_puzzle: State, strategy: str, strategy_params: StrategyParams) -> Collection[State]:
