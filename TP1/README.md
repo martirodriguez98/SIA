@@ -5,3 +5,36 @@ En este trabajo se implementa un programa que resuelve problemas de rompecabezas
   - BPP: Búsqueda Primero en Profundidad 
   - BPPV: Búsqueda en Profundidad Variable 
 - **Métodos de búsqueda informados:**
+  - Búsqueda heuristica local
+  - Búsqueda heuristica global
+  - A*
+
+## Configuración
+
+Esta se encuentra en el archivo `config.yaml` que contiene:
+- **strategy**
+  - name: hace referencia al onmbre del método de búsqueda a implementar, las posibles opciones son:
+
+    - BPA 
+    - BPP
+    - BPPV
+    - LOCAL_H
+    - GLOBAL_H
+    - A_STAR
+  - params: se utiliza solo con las búsquedas informadas
+  
+    - heuristic: refiere a las funciones heurísticas para los métodos de búsqueda informados, sus valores posibles son los siguientes:
+    
+      - manhattan_distance: 
+      - hamming_distance: Suma de las piezas que se encuentran fuera de lugar
+      - manhattan_hamming: Suma de las dos anteriores
+
+## Ejecución
+
+Para la ejecución del programa solo hay que correrlo.
+
+## Integrantes
+
+- Ana Tarantino Pedrosa 
+- Maria Victoria Conca 
+- Martina Rodriguez
