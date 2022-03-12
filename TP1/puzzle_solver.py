@@ -8,26 +8,23 @@ from TP1.strategies.bpp import bpp
 from TP1.strategies.bpa import bpa
 from TP1.strategies.bppv import bppv
 
-
 # def main(config_file: str):
 #     states:Collection[State] = puzzle_solver()
 
-strategy_map: Dict[str, Callable[[State],Collection[State]]] = {
-    'BPA': bpa, #BFS
-    'BPP': bpp, #DFS
-    'BPPV': bppv #IDDFS
+strategy_map: Dict[str, Callable[[State], Collection[State]]] = {
+    'BPA': bpa,  # BFS
+    'BPP': bpp,  # DFS
+    'BPPV': bppv  # IDDFS
 }
 
-def main():
 
+def main():
     initial_puzzle: State = create_puzzle(100)
     print(f'Puzzle to solve: {initial_puzzle}')
+    states: Collection[State] = puzzle_solver(initial_puzzle, 'BPP')
 
-    states: Collection[State] = puzzle_solver(initial_puzzle, 'BPA')
 
-
-def puzzle_solver(initial_puzzle: State, strategy: str )->Collection[State]:
-
+def puzzle_solver(initial_puzzle: State, strategy: str) -> Collection[State]:
     if strategy not in strategy_map:
         raise ValueError(f'Invalid strategy {strategy}. Valid strategies: {strategy_map.keys()}')
 
@@ -35,9 +32,9 @@ def puzzle_solver(initial_puzzle: State, strategy: str )->Collection[State]:
     print(initial_puzzle.puzzle)
     states: Collection[State] = strategy_map[strategy](initial_puzzle)
     end_time: float = perf_counter()
-    i=0
+    i = 0
     for s in states:
-        i+=1
+        i += 1
         print(f'pasos: {i}\n {s}')
     print(end_time)
     return states
@@ -51,4 +48,3 @@ if __name__ == "__main__":
 
     except FileNotFoundError as e:
         print(f'Configuration file {e.filename} not found')
-
