@@ -1,3 +1,4 @@
+import heapq
 from collections import deque
 from typing import Collection, Set, Deque, Callable
 
@@ -12,11 +13,11 @@ def local_heuristic(init_state: State, strategy_params: StrategyParams) -> Colle
     root = CostNode(init_state, None, heuristic)
     visited: Set[State] = set()
     visited.add(root.state)
-    queue: Deque[CostNode] = deque()
-    queue.append(root)
+    queue: [CostNode] = [root]
+    heapq.heapify(queue)
 
     while queue:
-        current: CostNode = queue.pop()
+        current: CostNode = heapq.heappop(queue)
 
         if current.puzzle_solved():
             return current.get_puzzle_solution()
@@ -29,6 +30,6 @@ def local_heuristic(init_state: State, strategy_params: StrategyParams) -> Colle
 
         for node in not_visited:
             visited.add(node.state)
-            queue.append(node)
+            heapq.heappush(queue, node)
 
     return []

@@ -1,4 +1,5 @@
 from collections import deque
+from functools import total_ordering
 from typing import Optional, Collection, Deque, Iterator, List, Callable
 
 from TP1.state import State
@@ -52,3 +53,15 @@ class CostNode(Node):
 
     def __repr__(self) -> str:
         return f'CosNode(state={repr(self.state)}\n parent_id={id(self.parent)})'
+
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, CostNode):
+            return False
+        return self.heuristic_cost == o.heuristic_cost
+
+    def __hash__(self) -> int:
+        return hash(self.heuristic_cost)
+
+    @total_ordering
+    def __lt__(self, other: 'CostNode') -> bool:
+        return self.heuristic_cost < other.heuristic_cost
