@@ -16,5 +16,4 @@ heuristics: Dict[str, Callable[[State], int]] = {
 def get_heuristic(heuristic_name: str) -> Callable[[State], int]:
     if heuristic_name not in heuristics:
         raise ValueError(f'Invalid heuristic {heuristic_name}. Currently supported: {heuristics.keys()}')
-    print('heuristic get')
     return heuristics[heuristic_name]
