@@ -45,6 +45,7 @@ class CostNode(Node):
     def __init__(self, state: State, parent: Optional['CostNode'], heuristic: Callable[[State], int]):
         super().__init__(state, parent)
         self.heuristic = heuristic
+        self.heuristic_cost = self.heuristic(self.state)
 
     def children(self) -> List['CostNode']:
         return list(map(lambda state: type(self)(state, self, self.heuristic), self.get_valid_states()))
