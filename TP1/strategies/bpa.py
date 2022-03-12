@@ -19,9 +19,6 @@ def bpa(init_state: State, strategy_params: StrategyParams) -> Collection[State]
     queue.append(root)
 
     while queue:
-        # print(f'Visited:')
-        # print(f' {visited}')
-
         current: Node = queue.popleft()
 
         if current.puzzle_solved():

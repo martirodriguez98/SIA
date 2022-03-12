@@ -31,16 +31,3 @@ def bpp(init_state: State, strategy_params: StrategyParams) -> Collection[State]
 
     return []
 
-#
-# def dfs_iterative(graph, start):
-#     stack, path = [start], []
-#
-#     while stack:
-#         vertex = stack.pop()
-#         if vertex in path:
-#             continue
-#         path.append(vertex)
-#         for neighbor in graph[vertex]:
-#             stack.append(neighbor)
-#
-#     return path

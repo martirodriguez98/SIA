@@ -7,22 +7,22 @@ from TP1.state import State
 
 def bppv(init_state: State, strategy_params: StrategyParams) -> Collection[State]:
 
-    step: int = (strategy_params.get('step',10) if strategy_params else 5) #todo Change step
+    step: int = (strategy_params.get('step',10) if strategy_params else 10) #todo Change step
 
     root: Node = Node(init_state, None)
 
     stack: Deque[Node] = deque()
 
-    neighbor_nodes:Deque[Node] = deque() #nodos de la frontera
+    neighbour_nodes:Deque[Node] = deque() #nodos de la frontera
 
-    neighbor_nodes.append(root)
+    neighbour_nodes.append(root)
 
     #when a state is reached, its depth is saved so if its found again it can decide if its worth exploring
     visited_states_depth: Dict[State, int] = dict()
     visited_states_depth[root.state] = 0
 
-    while neighbor_nodes:
-        node: Node = neighbor_nodes.popleft()
+    while neighbour_nodes:
+        node: Node = neighbour_nodes.popleft()
 
         max_depth: int = node.depth + step
         stack.append(node)
@@ -31,7 +31,7 @@ def bppv(init_state: State, strategy_params: StrategyParams) -> Collection[State
             current_node: Node = stack.pop()
 
             if current_node.depth >= max_depth:
-                neighbor_nodes.append(current_node)
+                neighbour_nodes.append(current_node)
                 continue
 
             if current_node.puzzle_solved():

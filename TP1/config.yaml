@@ -1,5 +1,5 @@
 strategy:
-  name: BPP
-#  params:
-#    heuristic: pieces_out_of_place
+  name: GLOBAL_H
+  params:
+    heuristic: manhattan_hamming
 #  step:

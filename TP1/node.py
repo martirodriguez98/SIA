@@ -42,20 +42,20 @@ class Node:
         return f'Node(state={repr(self.state)}\n parent_id={id(self.parent)})'
 
 
-class CostNode(Node):
-    def __init__(self, state: State, parent: Optional['CostNode'], heuristic: Callable[[State], int]):
+class HeuristicNode(Node):
+    def __init__(self, state: State, parent: Optional['HeuristicNode'], heuristic: Callable[[State], int]):
         super().__init__(state, parent)
         self.heuristic = heuristic
-        self.heuristic_cost = self.heuristic(self.state)
+        self.heuristic_cost:int = self.heuristic(self.state)
 
-    def children(self) -> List['CostNode']:
+    def children(self) -> List['HeuristicNode']:
         return list(map(lambda state: type(self)(state, self, self.heuristic), self.get_valid_states()))
 
     def __repr__(self) -> str:
         return f'CosNode(state={repr(self.state)}\n parent_id={id(self.parent)})'
 
     def __eq__(self, o: object) -> bool:
-        if not isinstance(o, CostNode):
+        if not isinstance(o, HeuristicNode):
             return False
         return self.heuristic_cost == o.heuristic_cost
 
@@ -63,5 +63,28 @@ class CostNode(Node):
         return hash(self.heuristic_cost)
 
     @total_ordering
-    def __lt__(self, other: 'CostNode') -> bool:
+    def __lt__(self, other: 'HeuristicNode') -> bool:
         return self.heuristic_cost < other.heuristic_cost
+
+class CostNode(HeuristicNode):
+    def get_cost(self):
+        return self.heuristic_cost + self.depth
+
+    def children(self) -> List['CostNode']:
+        return list(map(lambda state: type(self)(state, self, self.heuristic), self.get_valid_states()))
+
+    def __eq__(self, other):
+        if not isinstance(other, CostNode):
+            return False
+        return self.depth == other.depth and self.get_cost()
+
+    def __hash__(self) -> int:
+        return hash((self.heuristic_cost,self.depth))
+
+    @total_ordering
+    def __lt__(self, other: 'CostNode') -> bool:
+        equal_cost: bool = self.get_cost() == other.get_cost()
+        if equal_cost:
+            return self.heuristic_cost < other.heuristic_cost
+        else:
+            return self.get_cost() < other.get_cost()

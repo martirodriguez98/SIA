@@ -5,9 +5,11 @@ from typing import Collection, Callable, Dict, List
 from TP1.config_loader import Config, StrategyParams
 from TP1.puzzle_maker import create_puzzle
 from TP1.state import State
+from TP1.strategies.a_star import a_star
 from TP1.strategies.bpp import bpp
 from TP1.strategies.bpa import bpa
 from TP1.strategies.bppv import bppv
+from TP1.strategies.global_heuristic import global_heuristic
 from TP1.strategies.local_heuristic import local_heuristic
 
 # def main(config_file: str):
@@ -17,7 +19,9 @@ strategy_map: Dict[str, Callable[[State, StrategyParams], Collection[State]]] = 
     'BPA': bpa,  # BFS
     'BPP': bpp,  # DFS
     'BPPV': bppv,  # IDDFS
-    'GREEDY': local_heuristic  # GREEDY
+    'LOCAL_H': local_heuristic,  # GREEDY
+    'GLOBAL_H': global_heuristic,
+    'A_STAR': a_star
 }
 
 

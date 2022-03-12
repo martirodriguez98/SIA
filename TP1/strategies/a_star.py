@@ -1,7 +1,35 @@
-from typing import Collection
+import heapq
+from typing import Collection, Callable, Set
 
+from TP1.config_loader import StrategyParams
+from TP1.heuristic import get_heuristic_from_params
+from TP1.node import CostNode
 from TP1.state import State
 
 
-def a_star(init_state: State) -> Collection[State]:
+def a_star(init_state: State, strategy_params: StrategyParams) -> Collection[State]:
+    heuristic: Callable[[State], int] = get_heuristic_from_params(strategy_params)
+    root = CostNode(init_state, None, heuristic)
+    visited: Set[State] = set()
+    visited.add(root.state)
+    queue: [CostNode] = [root]
+    heapq.heapify(queue)
+
+    while queue:
+        current: CostNode = heapq.heappop(queue)
+
+        if current.puzzle_solved():
+            return current.get_puzzle_solution()
+
+        not_visited: set[CostNode] = set()
+
+        for node in current.children():
+            if node.state not in visited:
+                not_visited.add(node)
+
+        for node in not_visited:
+            visited.add(node.state)
+            heapq.heappush(queue, node)
+
     return []
+
