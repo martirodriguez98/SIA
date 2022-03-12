@@ -13,7 +13,6 @@ def bpa(init_state: State) -> Collection[State]:
     visited: Set[State] = set()
     visited.add(root.state)
 
-
     queue: Deque[Node] = deque()
     queue.append(root)
 
@@ -33,7 +32,6 @@ def bpa(init_state: State) -> Collection[State]:
             # print(node)
             if node.state not in visited:
                 not_visited.add(node)
-
 
         for node in not_visited:
             visited.add(node.state)
