@@ -26,7 +26,6 @@ def main(config_file: str):
 
     initial_puzzle: State = create_puzzle(100)
     print(f'Puzzle to solve: {initial_puzzle}')
-    states: Collection[State] = puzzle_solver(initial_puzzle, 'BPP')
 
     states: Collection[State] = puzzle_solver(initial_puzzle, config.strategy, config.strategy_params)
     # print(states)

@@ -1,5 +1,5 @@
 strategy:
-  name: GREEDY
-  params:
-    heuristic: pieces_out_of_place
+  name: BPP
+#  params:
+#    heuristic: pieces_out_of_place
 #  step:
