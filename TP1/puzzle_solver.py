@@ -26,20 +26,18 @@ def main(config_file: str):
     print(f'Puzzle to solve: {initial_puzzle}')
     states: Collection[State] = puzzle_solver(initial_puzzle, 'BPP')
 
-    states: Collection[State] = puzzle_solver(initial_puzzle, config.strategy)
+    states: Collection[State] = puzzle_solver(initial_puzzle, config.strategy, config.strategy_params)
+    print(states)
 
-def puzzle_solver(initial_puzzle: State, strategy: str) -> Collection[State]:
+def puzzle_solver(initial_puzzle: State, strategy: str ,strategy_params: StrategyParams)->Collection[State]:
+
     if strategy not in strategy_map:
         raise ValueError(f'Invalid strategy {strategy}. Valid strategies: {strategy_map.keys()}')
 
     start_time: float = perf_counter()
-    print(initial_puzzle.puzzle)
-    states: Collection[State] = strategy_map[strategy](initial_puzzle)
+    states: Collection[State] = strategy_map[strategy](initial_puzzle,strategy_params)
     end_time: float = perf_counter()
-    i=0
-    for s in states:
-        i+=1
-        print(f'pasos: {i}\n {s}')
+
     print(end_time)
     return states
 

@@ -1,11 +1,13 @@
 from collections import deque
 from typing import Collection, Set, Deque, Iterator
 import numpy as np
+
+from TP1.config_loader import StrategyParams
 from TP1.node import Node
 from TP1.state import State
 
 
-def bpa(init_state: State) -> Collection[State]:
+def bpa(init_state: State, strategy_params: StrategyParams) -> Collection[State]:
     root = Node(init_state, None)
 
     # visited: Set[State] = set()
