@@ -16,7 +16,7 @@ def local_heuristic(init_state: State, strategy_params: StrategyParams) -> Colle
     queue.append(root)
 
     while queue:
-        current: CostNode = queue.popleft()
+        current: CostNode = queue.pop()
 
         if current.puzzle_solved():
             return current.get_puzzle_solution()
