@@ -1,3 +1,5 @@
 strategy:
-  name: BPPV
+  name: GREEDY
+  params:
+    heuristic: pieces_out_of_place
 #  step:

@@ -8,18 +8,20 @@ from TP1.state import State
 from TP1.strategies.bpp import bpp
 from TP1.strategies.bpa import bpa
 from TP1.strategies.bppv import bppv
+from TP1.strategies.local_heuristic import local_heuristic
 
 # def main(config_file: str):
 #     states:Collection[State] = puzzle_solver()
 
-strategy_map: Dict[str, Callable[[State,StrategyParams],Collection[State]]] = {
-    'BPA': bpa, #BFS
-    'BPP': bpp, #DFS
-    'BPPV': bppv #IDDFS
+strategy_map: Dict[str, Callable[[State, StrategyParams], Collection[State]]] = {
+    'BPA': bpa,  # BFS
+    'BPP': bpp,  # DFS
+    'BPPV': bppv,  # IDDFS
+    'GREEDY': local_heuristic  # GREEDY
 }
 
-def main(config_file: str):
 
+def main(config_file: str):
     config: Config = Config(config_file)
 
     initial_puzzle: State = create_puzzle(100)
@@ -27,15 +29,15 @@ def main(config_file: str):
     states: Collection[State] = puzzle_solver(initial_puzzle, 'BPP')
 
     states: Collection[State] = puzzle_solver(initial_puzzle, config.strategy, config.strategy_params)
-    print(states)
+    # print(states)
 
-def puzzle_solver(initial_puzzle: State, strategy: str ,strategy_params: StrategyParams)->Collection[State]:
 
+def puzzle_solver(initial_puzzle: State, strategy: str, strategy_params: StrategyParams) -> Collection[State]:
     if strategy not in strategy_map:
         raise ValueError(f'Invalid strategy {strategy}. Valid strategies: {strategy_map.keys()}')
 
     start_time: float = perf_counter()
-    states: Collection[State] = strategy_map[strategy](initial_puzzle,strategy_params)
+    states: Collection[State] = strategy_map[strategy](initial_puzzle, strategy_params)
     end_time: float = perf_counter()
 
     print(end_time)
