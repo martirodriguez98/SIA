@@ -46,7 +46,7 @@ class State:
         return State(np.array(self.puzzle), self.empty_box)
 
     def __repr__(self) -> str:
-        return f'{self.puzzle}\n empty_box={self.empty_box}\n'
+        return f'{self.puzzle}\n'
 
     def __eq__(self, other):
         return isinstance(other, State) and np.array_equal(self.puzzle, other.puzzle)
