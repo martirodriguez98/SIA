@@ -5,9 +5,10 @@ from TP1.config_loader import StrategyParams
 from TP1.heuristic import get_heuristic_from_params
 from TP1.node import CostNode
 from TP1.state import State
+from TP1.statistics import Statistics
 
 
-def a_star(init_state: State, strategy_params: StrategyParams) -> Collection[State]:
+def a_star(init_state: State, strategy_params: StrategyParams, stats: Statistics) -> Collection[State]:
     heuristic: Callable[[State], int] = get_heuristic_from_params(strategy_params)
     root = CostNode(init_state, None, heuristic)
     visited: Set[State] = set()
@@ -17,8 +18,10 @@ def a_star(init_state: State, strategy_params: StrategyParams) -> Collection[Sta
 
     while queue:
         current: CostNode = heapq.heappop(queue)
-
+        stats.sum_cost(current.get_cost())
         if current.puzzle_solved():
+            stats.set_result(True)
+            stats.set_border_nodes_count(len(queue))
             return current.get_puzzle_solution()
 
         not_visited: set[CostNode] = set()
@@ -31,5 +34,5 @@ def a_star(init_state: State, strategy_params: StrategyParams) -> Collection[Sta
             visited.add(node.state)
             heapq.heappush(queue, node)
 
+        stats.sum_expanded_nodes()
     return []
-

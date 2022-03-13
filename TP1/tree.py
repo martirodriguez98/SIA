@@ -1,4 +1,4 @@
-from typing import Collection, List
+from typing import List
 from TP1.node import Node
 
 import graphviz
