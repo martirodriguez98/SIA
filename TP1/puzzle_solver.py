@@ -78,3 +78,6 @@ if __name__ == "__main__":
 
     except FileNotFoundError as e:
         print(f'Configuration file {e.filename} not found')
+
+    except KeyboardInterrupt:
+        print('Program was interrupted. Puzzle resolution ended incomplete.')
