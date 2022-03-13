@@ -51,11 +51,17 @@ class Statistics:
         print('*' * 50)
         print(f'Statistics')
         print('*' * 50)
-        print(f'Strategy: {repr(self.strategy)}\n'
-          f'Depth: {self.depth}\n'
-          f'Cost: {self.cost}\n'
-          f'Result: {aux}\n'
-          f'Total expanded nodes: {self.expanded_nodes_count}\n'
-          f'Total border nodes: {self.border_nodes_count}\n'
-          f'Process time: {self.process_time} seconds')
+        print(f'Strategy: {repr(self.strategy)}')
+        if self.strategy_params is not None:
+            if 'heuristic' in self.strategy_params:
+                print(f"Heuristic: {self.strategy_params['heuristic']}")
+            if 'step' in self.strategy_params:
+                print(f"Step: {self.strategy_params['step']}")
+        print(f'Depth: {self.depth}\n'
+              f'Cost: {self.cost}\n'
+              f'Result: {aux}\n'
+              f'Total expanded nodes: {self.expanded_nodes_count}\n'
+              f'Total border nodes: {self.border_nodes_count}\n'
+              f'Process time: {self.process_time} seconds'
+              )
         print('*' * 50)
