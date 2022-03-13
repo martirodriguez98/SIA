@@ -40,8 +40,9 @@ class Config:
 
         #check if matrix provided is ok
 
-        if self.initial_puzzle is not np.array and self.initial_puzzle is not None:
-            raise ValueError(f'Invalid syntax in Config file {config_path}. Initial puzzle must be a matrix of size 3.')
+        if self.initial_puzzle is not None:
+            if type(self.initial_puzzle) != np.ndarray:
+                raise ValueError(f'Invalid syntax in Config file {config_path}. Initial puzzle must be a matrix of size 3.')
 
         puzzle_as_list: List[int] = []
         if self.initial_puzzle is not None:
