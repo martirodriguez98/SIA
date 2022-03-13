@@ -1,6 +1,6 @@
 from collections import deque
 from functools import total_ordering
-from typing import Optional, Collection, Deque, Iterator, List, Callable
+from typing import Optional, Collection, Deque, List, Callable
 
 from TP1.state import State
 
@@ -21,7 +21,6 @@ class Node:
             for y in range(len(self.state.puzzle)):
                 if self.state.puzzle[x][y] != (3 * x + y + 1) and self.state.puzzle[x][y] != 0:
                     return False
-        print('solved')
         return True
 
     def get_puzzle_solution(self) -> Collection[State]:
@@ -46,7 +45,7 @@ class HeuristicNode(Node):
     def __init__(self, state: State, parent: Optional['HeuristicNode'], heuristic: Callable[[State], int]):
         super().__init__(state, parent)
         self.heuristic = heuristic
-        self.heuristic_cost:int = self.heuristic(self.state)
+        self.heuristic_cost: int = self.heuristic(self.state)
 
     def children(self) -> List['HeuristicNode']:
         return list(map(lambda state: type(self)(state, self, self.heuristic), self.get_valid_states()))
@@ -66,6 +65,7 @@ class HeuristicNode(Node):
     def __lt__(self, other: 'HeuristicNode') -> bool:
         return self.heuristic_cost < other.heuristic_cost
 
+
 class CostNode(HeuristicNode):
     def get_cost(self):
         return self.heuristic_cost + self.depth
@@ -79,7 +79,7 @@ class CostNode(HeuristicNode):
         return self.depth == other.depth and self.get_cost()
 
     def __hash__(self) -> int:
-        return hash((self.heuristic_cost,self.depth))
+        return hash((self.heuristic_cost, self.depth))
 
     @total_ordering
     def __lt__(self, other: 'CostNode') -> bool:

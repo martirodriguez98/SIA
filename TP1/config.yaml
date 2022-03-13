@@ -1,5 +1,5 @@
 strategy:
-  name: BPA
-#  params:
-#    heuristic: manhattan_hamming
+  name: GLOBAL_H
+  params:
+    heuristic: manhattan_hamming
 #  step:

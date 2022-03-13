@@ -25,3 +25,6 @@ class Config:
         self.strategy_params: StrategyParams = args['strategy'].get('params', None)
 
         return
+
+    def __repr__(self):
+        return f'Strategy: {repr(self.strategy)}\n Strategy parameters: {repr(self.strategy_params)}\n'

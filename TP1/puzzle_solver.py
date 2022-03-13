@@ -1,10 +1,11 @@
 import sys
 from time import perf_counter
-from typing import Collection, Callable, Dict, List
+from typing import Collection, Callable, Dict
 
 from TP1.config_loader import Config, StrategyParams
 from TP1.puzzle_maker import create_puzzle
 from TP1.state import State
+from TP1.statistics import Statistics
 from TP1.strategies.a_star import a_star
 from TP1.strategies.bpp import bpp
 from TP1.strategies.bpa import bpa
@@ -12,11 +13,11 @@ from TP1.strategies.bppv import bppv
 from TP1.strategies.global_heuristic import global_heuristic
 from TP1.strategies.local_heuristic import local_heuristic
 
-strategy_map: Dict[str, Callable[[State, StrategyParams], Collection[State]]] = {
+strategy_map: Dict[str, Callable[[State, StrategyParams, Statistics], Collection[State]]] = {
     'BPA': bpa,  # BFS
     'BPP': bpp,  # DFS
     'BPPV': bppv,  # IDDFS
-    'LOCAL_H': local_heuristic,  # GREEDY
+    'LOCAL_H': local_heuristic,
     'GLOBAL_H': global_heuristic,
     'A_STAR': a_star
 }
@@ -24,24 +25,32 @@ strategy_map: Dict[str, Callable[[State, StrategyParams], Collection[State]]] = 
 
 def main(config_file: str):
     config: Config = Config(config_file)
+    stats: Statistics = Statistics(config)
 
     initial_puzzle: State = create_puzzle(100)
     print(f'Puzzle to solve: {initial_puzzle}')
 
-    states: Collection[State] = puzzle_solver(initial_puzzle, config.strategy, config.strategy_params)
-
+    states: Collection[State] = puzzle_solver(initial_puzzle, config.strategy, config.strategy_params, stats)
+    stats.print_stats()
     # print(states)
 
 
-def puzzle_solver(initial_puzzle: State, strategy: str, strategy_params: StrategyParams) -> Collection[State]:
+def puzzle_solver(initial_puzzle: State, strategy: str, strategy_params: StrategyParams, stats: Statistics) -> \
+        Collection[State]:
     if strategy not in strategy_map:
         raise ValueError(f'Invalid strategy {strategy}. Valid strategies: {strategy_map.keys()}')
 
     start_time: float = perf_counter()
-    states: Collection[State] = strategy_map[strategy](initial_puzzle, strategy_params)
+    states: Collection[State] = strategy_map[strategy](initial_puzzle, strategy_params, stats)
     end_time: float = perf_counter()
+    stats.set_process_time(start_time, end_time)
+    stats.set_depth(len(states))
 
-    print(end_time)
+    if not states:
+        stats.set_border_nodes_count(0)
+    else:
+        stats.set_states(states)
+
     return states
 
 
