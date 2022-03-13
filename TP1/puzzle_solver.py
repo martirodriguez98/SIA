@@ -31,7 +31,7 @@ def main(config_file: str):
 
     if config.initial_puzzle is not None:
         index = np.where(config.initial_puzzle == 0)
-        initial_puzzle: State = State(config.initial_puzzle,[index[0][0],index[1][0]])
+        initial_puzzle: State = State(config.initial_puzzle, [index[0][0], index[1][0]])
     else:
         initial_puzzle: State = create_puzzle(100)
 
@@ -40,7 +40,6 @@ def main(config_file: str):
     print(f'Solution:\n')
     for s in states:
         print(s)
-
 
 
 def puzzle_solver(initial_puzzle: State, strategy: str, strategy_params: StrategyParams, stats: Statistics) -> \

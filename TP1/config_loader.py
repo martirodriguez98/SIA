@@ -6,6 +6,7 @@ import yaml
 StrategyParams = Optional[Dict[str, Any]]
 BOARD_SIZE = 3
 
+
 class Config:
     def __init__(self, config_path: str):
         # if a different path is receive for configuration we have to open it and set it
@@ -32,13 +33,12 @@ class Config:
 
         self.strategy_params: StrategyParams = args['strategy'].get('params', None)
 
-
-        puzzle_str: str = args.get('initial_puzzle',None)
+        puzzle_str: str = args.get('initial_puzzle', None)
         self.initial_puzzle: Optional[np.array] = None
         if puzzle_str is not None:
-            self.initial_puzzle = np.array(args.get('initial_puzzle'),int)
+            self.initial_puzzle = np.array(args.get('initial_puzzle'), int)
 
-        #check if matrix provided is ok
+        # check if matrix provided is ok
 
         if self.initial_puzzle is not None:
             if type(self.initial_puzzle) != np.ndarray or self.initial_puzzle.size != 9:
@@ -51,10 +51,12 @@ class Config:
             for x in range(len(self.initial_puzzle)):
                 for y in range(len(self.initial_puzzle)):
                     if len(self.initial_puzzle[x]) != BOARD_SIZE:
-                        raise ValueError(f'Invalid syntax in Config file {config_path}. Matrix must be of size {BOARD_SIZE}.')
+                        raise ValueError(
+                            f'Invalid syntax in Config file {config_path}. Matrix must be of size {BOARD_SIZE}.')
                     puzzle_as_list.append(self.initial_puzzle[x][y])
                     if self.initial_puzzle[x][y] < 0 or self.initial_puzzle[x][y] > 8:
-                        raise ValueError(f'Invalid syntax in Config file {config_path}. Elements in matrix must be from 0 to 8.')
+                        raise ValueError(
+                            f'Invalid syntax in Config file {config_path}. Elements in matrix must be from 0 to 8.')
 
         if len(puzzle_as_list) != len(set(puzzle_as_list)):
             raise ValueError(f'Invalid syntax in Config file {config_path}. Elements in matrix cant be repeated.')
