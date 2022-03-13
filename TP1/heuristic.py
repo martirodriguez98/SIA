@@ -26,13 +26,21 @@ def manhattan_distance(state: State) -> int:
     dist: int = 0
     for x in range(len(state.puzzle)):
         for y in range(len(state.puzzle)):
-            coord = get_coordinate(state.puzzle[x][y])
-            dist += (abs(x - coord[0]) + abs(y - coord[1]))
+            if state.puzzle[x][y] != 0:
+                coord = get_coordinate(state.puzzle[x][y])
+                dist += (abs(x - coord[0]) + abs(y - coord[1]))
     return dist
 
 
+#we add were is the 0 to make it not admissible and also return the sum of the other two
 def manhattan_hamming(state: State) -> int:
-    return hamming_distance(state) + manhattan_distance(state)
+    dist: int = 0
+    index = np.where(state.puzzle == 0)
+    if index[0] != 2 or index[1] != 2:
+        dist += 1
+    dist += (abs(index[0] - 2) + abs(index[1] - 2))
+    dist += hamming_distance(state) + manhattan_distance(state)
+    return dist
 
 
 heuristics: Dict[str, Callable[[State], int]] = {

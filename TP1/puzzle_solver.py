@@ -1,6 +1,8 @@
 import sys
 from time import perf_counter
-from typing import Collection, Callable, Dict
+from typing import Collection, Callable, Dict, Tuple
+
+import numpy as np
 
 from TP1.config_loader import Config, StrategyParams
 from TP1.puzzle_maker import create_puzzle
@@ -27,12 +29,18 @@ def main(config_file: str):
     config: Config = Config(config_file)
     stats: Statistics = Statistics(config)
 
-    initial_puzzle: State = create_puzzle(100)
-    print(f'Puzzle to solve: {initial_puzzle}')
+    if config.initial_puzzle is not None:
+        index = np.where(config.initial_puzzle == 0)
+        initial_puzzle: State = State(config.initial_puzzle,[index[0][0],index[1][0]])
+    else:
+        initial_puzzle: State = create_puzzle(100)
 
     states: Collection[State] = puzzle_solver(initial_puzzle, config.strategy, config.strategy_params, stats)
     stats.print_stats()
-    # print(states)
+    print(f'Solution:\n')
+    for s in states:
+        print(s)
+
 
 
 def puzzle_solver(initial_puzzle: State, strategy: str, strategy_params: StrategyParams, stats: Statistics) -> \
