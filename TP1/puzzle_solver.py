@@ -12,9 +12,6 @@ from TP1.strategies.bppv import bppv
 from TP1.strategies.global_heuristic import global_heuristic
 from TP1.strategies.local_heuristic import local_heuristic
 
-# def main(config_file: str):
-#     states:Collection[State] = puzzle_solver()
-
 strategy_map: Dict[str, Callable[[State, StrategyParams], Collection[State]]] = {
     'BPA': bpa,  # BFS
     'BPP': bpp,  # DFS
@@ -32,6 +29,7 @@ def main(config_file: str):
     print(f'Puzzle to solve: {initial_puzzle}')
 
     states: Collection[State] = puzzle_solver(initial_puzzle, config.strategy, config.strategy_params)
+
     # print(states)
 
 

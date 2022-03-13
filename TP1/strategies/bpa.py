@@ -5,6 +5,7 @@ import numpy as np
 from TP1.config_loader import StrategyParams
 from TP1.node import Node
 from TP1.state import State
+from TP1.tree import Graph
 
 
 def bpa(init_state: State, strategy_params: StrategyParams) -> Collection[State]:
@@ -18,8 +19,10 @@ def bpa(init_state: State, strategy_params: StrategyParams) -> Collection[State]
     queue: Deque[Node] = deque()
     queue.append(root)
 
+    graph: Graph = Graph(root)
     while queue:
         current: Node = queue.popleft()
+        graph.add_node(current)
 
         if current.puzzle_solved():
             return current.get_puzzle_solution()
@@ -36,4 +39,5 @@ def bpa(init_state: State, strategy_params: StrategyParams) -> Collection[State]
             visited.add(node.state)
             queue.append(node)
 
+    graph.dot.render(view=True)
     return []

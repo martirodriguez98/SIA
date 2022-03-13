@@ -17,7 +17,6 @@ def local_heuristic(init_state: State, strategy_params: StrategyParams) -> Colle
     neighbour_nodes: [HeuristicNode] = [root]
     heapq.heapify(neighbour_nodes)
 
-
     while neighbour_nodes:
         neighbour_node: HeuristicNode = heapq.heappop(neighbour_nodes)
         neighbour_heuristic: int = neighbour_node.heuristic_cost
