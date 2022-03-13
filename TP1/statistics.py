@@ -51,8 +51,7 @@ class Statistics:
         print('*' * 50)
         print(f'Statistics')
         print('*' * 50)
-        print(f'Strategy: {self.strategy}\n'
-          f'Strategy parameters: {self.strategy_params}\n'
+        print(f'Strategy: {repr(self.strategy)}\n'
           f'Depth: {self.depth}\n'
           f'Cost: {self.cost}\n'
           f'Result: {aux}\n'
