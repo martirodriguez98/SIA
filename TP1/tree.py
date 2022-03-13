@@ -1,5 +1,5 @@
 from typing import List
-from TP1.node import Node
+from node import Node
 
 import graphviz
 

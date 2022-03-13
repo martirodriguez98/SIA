@@ -1,7 +1,7 @@
 import random
 import numpy as np
 
-from TP1.state import State
+from state import State
 
 BOARD_SIZE = 3
 OBJECTIVE: State = State(

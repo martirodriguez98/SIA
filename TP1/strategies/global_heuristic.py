@@ -1,11 +1,11 @@
 import heapq
 from typing import Collection, Set, Callable
 
-from TP1.config_loader import StrategyParams
-from TP1.heuristic import get_heuristic_from_params
-from TP1.node import HeuristicNode
-from TP1.state import State
-from TP1.statistics import Statistics
+from config_loader import StrategyParams
+from heuristic import get_heuristic_from_params
+from node import HeuristicNode
+from state import State
+from statistics import Statistics
 
 
 def global_heuristic(init_state: State, strategy_params: StrategyParams, stats: Statistics) -> Collection[State]:

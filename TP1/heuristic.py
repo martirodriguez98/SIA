@@ -2,8 +2,8 @@ from typing import Callable, Dict
 
 import numpy as np
 
-from TP1.config_loader import StrategyParams
-from TP1.state import State
+from config_loader import StrategyParams
+from state import State
 
 OBJECTIVE: np.array = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 0]], int)
 

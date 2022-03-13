@@ -1,6 +1,6 @@
 from typing import Optional, Collection
-from TP1.config_loader import Config, StrategyParams
-from TP1.state import State
+from config_loader import Config, StrategyParams
+from state import State
 
 
 class Statistics:

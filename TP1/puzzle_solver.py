@@ -1,19 +1,19 @@
 import sys
 from time import perf_counter
-from typing import Collection, Callable, Dict, Tuple
+from typing import Collection, Callable, Dict
 
 import numpy as np
 
-from TP1.config_loader import Config, StrategyParams
-from TP1.puzzle_maker import create_puzzle
-from TP1.state import State
-from TP1.statistics import Statistics
-from TP1.strategies.a_star import a_star
-from TP1.strategies.bpp import bpp
-from TP1.strategies.bpa import bpa
-from TP1.strategies.bppv import bppv
-from TP1.strategies.global_heuristic import global_heuristic
-from TP1.strategies.local_heuristic import local_heuristic
+from config_loader import Config, StrategyParams
+from puzzle_maker import create_puzzle
+from state import State
+from statistics import Statistics
+from strategies.a_star import a_star
+from strategies.bpp import bpp
+from strategies.bpa import bpa
+from strategies.bppv import bppv
+from strategies.global_heuristic import global_heuristic
+from strategies.local_heuristic import local_heuristic
 
 strategy_map: Dict[str, Callable[[State, StrategyParams, Statistics], Collection[State]]] = {
     'BPA': bpa,  # BFS

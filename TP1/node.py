@@ -2,7 +2,7 @@ from collections import deque
 from functools import total_ordering
 from typing import Optional, Collection, Deque, List, Callable
 
-from TP1.state import State
+from state import State
 
 
 class Node:
