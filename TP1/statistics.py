@@ -65,3 +65,4 @@ class Statistics:
               f'Process time: {self.process_time} seconds'
               )
         print('*' * 50)
+
