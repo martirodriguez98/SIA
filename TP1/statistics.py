@@ -4,9 +4,9 @@ from state import State
 
 
 class Statistics:
-    def __init__(self, config_file: Config):
-        self.strategy: str = config_file.strategy
-        self.strategy_params: StrategyParams = config_file.strategy_params
+    def __init__(self, strategy: str, strategy_params: StrategyParams):
+        self.strategy: str = strategy
+        self.strategy_params: StrategyParams = strategy_params
         self.depth: int = 0
         self.cost: Optional[int] = None
         self.result: bool = False

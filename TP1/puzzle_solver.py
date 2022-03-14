@@ -27,7 +27,7 @@ strategy_map: Dict[str, Callable[[State, StrategyParams, Statistics], Collection
 
 def main(config_file: str):
     config: Config = Config(config_file)
-    stats: Statistics = Statistics(config)
+    stats: Statistics = Statistics(config.strategy,config.strategy_params)
 
     if config.initial_puzzle is not None:
         index = np.where(config.initial_puzzle == 0)
