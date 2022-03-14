@@ -1,4 +1,4 @@
 strategy:
-  name: BPA
+  name: GLOBAL_H
   params:
-    heuristic:
+    heuristic: manhattan_hamming

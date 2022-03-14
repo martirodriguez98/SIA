@@ -6,10 +6,10 @@ from config_loader import StrategyParams
 from heuristic import get_heuristic_from_params
 from node import HeuristicNode
 from state import State
-from statistics import Statistics
+from stats import Stats
 
 
-def local_heuristic(init_state: State, strategy_params: StrategyParams, stats: Statistics) -> Collection[State]:
+def local_heuristic(init_state: State, strategy_params: StrategyParams, stats: Stats) -> Collection[State]:
     heuristic: Callable[[State], int] = get_heuristic_from_params(strategy_params)
     root = HeuristicNode(init_state, None, heuristic)
     visited: Set[State] = set()

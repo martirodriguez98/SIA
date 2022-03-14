@@ -4,10 +4,10 @@ from typing import Collection, Set, Deque
 from config_loader import StrategyParams
 from node import Node
 from state import State
-from statistics import Statistics
+from stats import Stats
 
 
-def bpa(init_state: State, strategy_params: StrategyParams, stats: Statistics) -> Collection[State]:
+def bpa(init_state: State, strategy_params: StrategyParams, stats: Stats) -> Collection[State]:
     root = Node(init_state, None)
     visited: Set[State] = set()
     visited.add(root.state)

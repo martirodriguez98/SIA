@@ -5,10 +5,10 @@ from config_loader import StrategyParams
 from heuristic import get_heuristic_from_params
 from node import CostNode
 from state import State
-from statistics import Statistics
+from stats import Stats
 
 
-def a_star(init_state: State, strategy_params: StrategyParams, stats: Statistics) -> Collection[State]:
+def a_star(init_state: State, strategy_params: StrategyParams, stats: Stats) -> Collection[State]:
     heuristic: Callable[[State], int] = get_heuristic_from_params(strategy_params)
     root = CostNode(init_state, None, heuristic)
     visited: Set[State] = set()

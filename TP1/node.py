@@ -37,6 +37,12 @@ class Node:
     def children(self) -> List['Node']:
         return list(map(lambda state: Node(state, self), self.get_valid_states()))
 
+    def __eq__(self, other):
+        return isinstance(other,Node) and self.state == other.state
+
+    def __hash__(self):
+        return hash(self.state)
+
     def __repr__(self) -> str:
         return f'Node(state={repr(self.state)}\n parent_id={id(self.parent)})'
 
@@ -56,10 +62,10 @@ class HeuristicNode(Node):
     def __eq__(self, o: object) -> bool:
         if not isinstance(o, HeuristicNode):
             return False
-        return self.heuristic_cost == o.heuristic_cost
+        return self.heuristic_cost == o.heuristic_cost and self.state == o.state
 
     def __hash__(self) -> int:
-        return hash(self.heuristic_cost)
+        return hash((self.heuristic_cost,hash(self.state)))
 
     @total_ordering
     def __lt__(self, other: 'HeuristicNode') -> bool:
@@ -76,10 +82,10 @@ class CostNode(HeuristicNode):
     def __eq__(self, other):
         if not isinstance(other, CostNode):
             return False
-        return self.depth == other.depth and self.get_cost()
+        return self.depth == other.depth and self.get_cost() == other.get_cost() and self.state == other.state
 
     def __hash__(self) -> int:
-        return hash((self.heuristic_cost, self.depth))
+        return hash((self.heuristic_cost, self.depth,self.state))
 
     @total_ordering
     def __lt__(self, other: 'CostNode') -> bool:

@@ -7,7 +7,7 @@ import numpy as np
 from config_loader import Config, StrategyParams
 from puzzle_maker import create_puzzle
 from state import State
-from statistics import Statistics
+from stats import Stats
 from strategies.a_star import a_star
 from strategies.bpp import bpp
 from strategies.bpa import bpa
@@ -15,7 +15,7 @@ from strategies.bppv import bppv
 from strategies.global_heuristic import global_heuristic
 from strategies.local_heuristic import local_heuristic
 
-strategy_map: Dict[str, Callable[[State, StrategyParams, Statistics], Collection[State]]] = {
+strategy_map: Dict[str, Callable[[State, StrategyParams, Stats], Collection[State]]] = {
     'BPA': bpa,  # BFS
     'BPP': bpp,  # DFS
     'BPPV': bppv,  # IDDFS
@@ -27,7 +27,7 @@ strategy_map: Dict[str, Callable[[State, StrategyParams, Statistics], Collection
 
 def main(config_file: str):
     config: Config = Config(config_file)
-    stats: Statistics = Statistics(config.strategy,config.strategy_params)
+    stats: Stats = Stats(config.strategy, config.strategy_params)
 
     if config.initial_puzzle is not None:
         index = np.where(config.initial_puzzle == 0)
@@ -42,7 +42,7 @@ def main(config_file: str):
         print(s)
 
 
-def puzzle_solver(initial_puzzle: State, strategy: str, strategy_params: StrategyParams, stats: Statistics) -> \
+def puzzle_solver(initial_puzzle: State, strategy: str, strategy_params: StrategyParams, stats: Stats) -> \
         Collection[State]:
     if strategy not in strategy_map:
         raise ValueError(f'Invalid strategy {strategy}. Valid strategies: {strategy_map.keys()}')

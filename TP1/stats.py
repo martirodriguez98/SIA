@@ -3,7 +3,7 @@ from config_loader import Config, StrategyParams
 from state import State
 
 
-class Statistics:
+class Stats:
     def __init__(self, strategy: str, strategy_params: StrategyParams):
         self.strategy: str = strategy
         self.strategy_params: StrategyParams = strategy_params

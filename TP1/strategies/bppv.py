@@ -4,10 +4,10 @@ from typing import Collection, Deque, Dict, List
 from config_loader import StrategyParams
 from node import Node
 from state import State
-from statistics import Statistics
+from stats import Stats
 
 
-def bppv(init_state: State, strategy_params: StrategyParams, stats: Statistics) -> Collection[State]:
+def bppv(init_state: State, strategy_params: StrategyParams, stats: Stats) -> Collection[State]:
     step: int = (strategy_params.get('step', 10) if strategy_params else 20)
 
     root: Node = Node(init_state, None)

@@ -38,7 +38,7 @@ def manhattan_hamming(state: State) -> int:
     index = np.where(state.puzzle == 0)
     if index[0] != 2 or index[1] != 2:
         dist += 1
-    dist += (abs(index[0] - 2) + abs(index[1] - 2))
+    dist += (abs(index[0] - 2)[0] + abs(index[1] - 2)[0])
     dist += hamming_distance(state) + manhattan_distance(state)
     return dist
 
