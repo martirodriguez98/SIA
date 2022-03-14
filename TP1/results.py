@@ -23,9 +23,38 @@ def csv_results(file: str, data: List[List[str]]):
 
 
 def generate_results(initial_state: str, strategy_name: str, heuristic=None, step=None):
-    result = [{'initial_puzzle': [{initial_state}]}, {'strategy': [{'name': [strategy_name]},
-                                                                   [{'params': [{'heuristic': [heuristic]},
-                                                                                [{'step': [step]}]]}]]}]
+
+    result = {
+        'initial_puzzle': initial_state,
+        'strategy': {
+            'name': strategy_name,
+        }
+    }
+
+    if heuristic is not None:
+        result = {
+            'initial_puzzle': initial_state,
+            'strategy': {
+                'name': strategy_name,
+                'params': {
+                    'heuristic': heuristic
+                }
+            }
+        }
+
+    if step is not None:
+        result = {
+            'initial_puzzle': initial_state,
+            'strategy': {
+                'name': strategy_name,
+                'params': {
+                    'step': step
+                }
+            }
+        }
+
+
+
     with open('config.yaml', 'w') as file:
         document = yaml.dump(result, file)
 
@@ -47,4 +76,8 @@ def generate_results(initial_state: str, strategy_name: str, heuristic=None, ste
 if __name__ == "__main__":
     init_state = create_puzzle(100)
     state_str = (",".join(str(init_state.puzzle).splitlines()))
+    state_str = state_str.replace(' ',',')
+    state_str = state_str.replace(',,',',')
+    state_str = state_str.replace('\'','')
+    print(state_str)
     generate_results(state_str, "BPA")

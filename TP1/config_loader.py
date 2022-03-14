@@ -36,7 +36,8 @@ class Config:
         puzzle_str: str = args.get('initial_puzzle', None)
         self.initial_puzzle: Optional[np.array] = None
         if puzzle_str is not None:
-            self.initial_puzzle = np.array(args.get('initial_puzzle'), int)
+            self.initial_puzzle = np.array((args.get('initial_puzzle')), int)
+
 
         # check if matrix provided is ok
 
