@@ -44,6 +44,7 @@ def generate_results(initial_state: State, strategy_name: str, strategy_params: 
 
 if __name__ == "__main__":
     init_state = create_puzzle(100)
+    print(init_state)
     generate_results(init_state, "BPA")
     generate_results(init_state,"BPP")
     generate_results(init_state,"BPPV",{"step":20,"heuristic":None})
