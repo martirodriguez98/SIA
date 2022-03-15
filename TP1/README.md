@@ -23,6 +23,12 @@ En caso de querer proveer un archivo de configuración diferente, se debe ejecut
 
 Una vez finalizado, se imprimirán las estadísticas por salida estándar.
 
+### Requisitos
+  Tener instalado previamente:
+
+  `numpy`
+
+  `yaml`
 
 ## Configuración
 
