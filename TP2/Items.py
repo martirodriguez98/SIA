@@ -12,6 +12,7 @@ class Item:
         self.benefit: int = benefit
         self.weight: int = weight
         self.selected: int = 0
+        self.fitness: int = 0
 
     def __repr__(self):
         return f'benefit: {self.benefit}, weight: {self.weight}'
@@ -40,10 +41,9 @@ class Items:
             index = np.random.randint(0, len(aux_items))
             item: Item = aux_items.pop(index)
             if bag.weight + item.weight <= self.max_weight:
+                item.selected = 1
+                item.fitness = item.benefit / item.weight
                 bag.bag.add(item)
                 bag.weight += item.weight
                 bag.benefit += item.benefit
-
-        print(bag.weight)
-        print(len(bag.bag))
         return bag

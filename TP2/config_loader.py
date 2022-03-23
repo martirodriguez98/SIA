@@ -1,11 +1,12 @@
 import sys
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import schema
 import yaml
 from schema import Schema, SchemaError
 
 Param = Dict[str, Any]
+ParamValidator = Optional[Schema]
 
 
 class Config:
