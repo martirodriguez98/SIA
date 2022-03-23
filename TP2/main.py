@@ -1,14 +1,15 @@
 import sys
 
 from Items import Items
+from resolver import Resolver
 from config_loader import Config
 
 
 def main(config_file: str):
     config: Config = Config(config_file)
     items: Items = Items(config.items_file)
-    for i in range(len(items.items)):
-        print(items.items[i])
+    resolver: Resolver = Resolver(config, items)
+    resolver.bag_packer()
 
 
 if __name__ == '__main__':
@@ -31,5 +32,3 @@ if __name__ == '__main__':
 
     except KeyboardInterrupt:
         print('Program was interrupted. Optimization ended incomplete.')
-
-

@@ -7,6 +7,7 @@ from schema import Schema, SchemaError
 
 Param = Dict[str, Any]
 
+
 class Config:
 
     @staticmethod
@@ -16,7 +17,6 @@ class Config:
         except SchemaError as e:
             print('A problem was found on the configuration file:\n')
             sys.exit(e.code)
-
 
     def __init__(self, config_path: str):
         # if a different path is receive for configuration we have to open it and set it
@@ -31,7 +31,9 @@ class Config:
             raise ValueError(f'Invalid syntax in Config file {config_path}')
 
         args = Config.validate_param(args, Schema({
-            'items_file': str
+            'items_file': str,
+            'population_size': schema.And(int, lambda population_size: population_size > 0)
         }))
 
         self.items_file: str = args['items_file']
+        self.population_size: int = args['population_size']

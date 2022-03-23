@@ -88,3 +88,13 @@ TP2/.idea/modules.xml
 TP2/.idea/vcs.xml
 
 TP2/.idea/workspace.xml
+
+TP2/__pycache__/bag.cpython-310.pyc
+
+TP2/__pycache__/config_loader.cpython-310.pyc
+
+TP2/__pycache__/generation.cpython-310.pyc
+
+TP2/__pycache__/Items.cpython-310.pyc
+
+TP2/__pycache__/resolver.cpython-310.pyc
