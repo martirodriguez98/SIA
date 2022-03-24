@@ -1,14 +1,17 @@
 import sys
+from typing import List, Tuple
 
-from Items import Items
+from bag import Bag
+from data_loader import Item, load_data
 from resolver import Resolver
 from config_loader import Config
 
 
 def main(config_file: str):
     config: Config = Config(config_file)
-    items: Items = Items(config.items_file)
-    resolver: Resolver = Resolver(config, items)
+    data_loaded: Tuple[int,int,List[Item]] = load_data(config.items_file)
+    bag: Bag = Bag(data_loaded[0],data_loaded[1],data_loaded[2])
+    resolver: Resolver = Resolver(config, bag)
     resolver.bag_packer()
 
 

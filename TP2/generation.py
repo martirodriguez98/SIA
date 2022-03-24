@@ -1,13 +1,23 @@
-from Items import Items
+from typing import List
+
+import bag
 from bag import Bag
 
+Population = List[bag.Individual]
 
 class Generation:
 
     @staticmethod
-    def create_first_generation(items: Items, population_size: int) -> 'Generation':
-        return Generation(items.generate_random_set(population_size), 0)
+    def create_first_generation(bag: Bag, generation_size: int) -> 'Generation':
+        population: Population = []
+        for _ in range(generation_size):
+            population.append(bag.generate_random_set())
+        return Generation(population,0)
 
-    def __init__(self, bag: Bag, gen_count: int):
-        self.bag: Bag = bag
-        self.generation_size: int = gen_count
+    def __init__(self, population: Population, gen_count: int):
+        self.population: Population = population
+        self.gen_count: int = gen_count
+
+
+
+

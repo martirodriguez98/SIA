@@ -1,10 +1,11 @@
 from typing import Dict, Tuple, Callable
 
-from population import Population
+from bag import Bag
 from config_loader import Param, ParamValidator
 from generation import Generation
 
-Selector = Callable[[Generation, int, Param], Population]
+Selector = Callable[[Generation, int],Bag]
+InternalSelector = Callable[[Generation, Param], Bag]
 
 
 def elite_selector(generation: Generation):
@@ -32,7 +33,7 @@ def truncate_selector(generation: Generation):
 
 
 # TODO completar parámetros de las funciones
-selector_function: Dict[str, Tuple[Selector, ParamValidator]] = {
+selector_function: Dict[str, Tuple[InternalSelector, ParamValidator]] = {
     'elite': (elite_selector, None),
     'roulette': (roulette_selector, None),
     'rank': (rank_selector, None),
