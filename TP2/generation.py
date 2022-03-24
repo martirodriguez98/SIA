@@ -11,8 +11,10 @@ class Generation:
     @staticmethod
     def create_first_generation(bag: Bag, generation_size: int) -> 'Generation':
         population: Population = []
-        for _ in range(generation_size):
-            population.append(bag.generate_random_set())
+        for size in range(generation_size):
+            individual = bag.generate_random_set()
+            if individual not in population:
+                population.append(individual)
         return Generation(population, 0)
 
     def __init__(self, population: Population, gen_count: int):
