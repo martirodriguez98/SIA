@@ -106,3 +106,5 @@ TP2/__pycache__/data_loader.cpython-39.pyc
 TP2/__pycache__/generation.cpython-39.pyc
 
 TP2/__pycache__/resolver.cpython-39.pyc
+
+*.pyc

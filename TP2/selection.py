@@ -4,7 +4,7 @@ from bag import Bag
 from config_loader import Param, ParamValidator
 from generation import Generation
 
-Selector = Callable[[Generation, int],Bag]
+Selector = Callable[[Generation, int], Bag]
 InternalSelector = Callable[[Generation, Param], Bag]
 
 
