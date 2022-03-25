@@ -4,8 +4,9 @@ from typing import Dict, Tuple, Callable, Collection, List
 
 import numpy as np
 from numpy.random.mtrand import choice
+from schema import Schema, And, Or
 
-from bag import Bag
+from bag import Bag, Individual
 from config_loader import Param, ParamValidator
 from generation import Generation, Population
 
@@ -21,20 +22,16 @@ def get_individual_probs(population: Population, bag: Bag) -> Collection[float]:
     return aux
 
 
-def roulette_random_number(population: Population, bag: Bag, size: int) -> Collection[float]:
-    return choice(population, size, p=get_individual_probs(population, bag))
-
-
 def elite_selector(generation: Generation) -> Population:
     return sorted(generation.population, key=lambda i: i.calculate_total_fitness(i), reverse=True)
 
 
-def roulette_selector(generation: Generation, bag: Bag, size: int):
-    return [
-        roulette_random_number(generation.population, bag, size)
-        for _ in range(size)
-    ]
+def roulette_random_number(population: Population, bag: Bag, size: int) -> Population:
+    return choice(population, size, p=get_individual_probs(population, bag))
 
+
+def roulette_selector(generation: Generation, bag: Bag, size: int) -> Population:
+    return roulette_random_number(generation.population, bag, size)
 
 def rank_selector(generation: Generation):
     return
@@ -55,29 +52,61 @@ def calculate_boltzmann(generation: Generation, bag: Bag, k: float, t0: float, t
     return get_prob(boltzmann_fitness_list)
 
 
-def boltzmann_selector(generation: Generation, bag: Bag, size: int, param: Param):
-    return roulette_selector(
-        generation,
-        bag,
-        roulette_random_number(generation.population, bag, size),
-        calculate_boltzmann(generation, bag, param['k'], param['initial_temp'], param['final_temp'])
-    )
+def boltzmann_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
+    return choice(generation.population, size, p=calculate_boltzmann(generation, bag, param['k'], param['initial_temp'], param['final_temp']))
+
+def fitness_key(i: Individual, bag: Bag) -> float:
+    return bag.calculate_total_fitness(i)
+
+def probabilistic_selection(population: Population,bag: Bag, tournament_prob: float) -> Individual:
+    rand: float = random.uniform(0,1)
+    if rand < tournament_prob:
+        return max(population, key=fitness_key) #TODO check if it's working
+    else:
+        return min(population, key=fitness_key)
+
+def tournament_winner(population: Population,bag: Bag, tournament_prob: float) -> Individual:
+    winners = [
+        probabilistic_selection(random.sample(population,2),bag,tournament_prob),
+        probabilistic_selection(random.sample(population,2),bag,tournament_prob)
+    ]
+    return probabilistic_selection(winners,bag,tournament_prob)
+
+def prob_tournament_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
+    return [
+        tournament_winner(generation.population,bag,param['tournament_probability'])
+        for _ in range(size)
+    ]
 
 
-def prob_tournament_selector(generation: Generation):
-    return
+def truncate_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
+    if param['k'] >= math.floor(param['population_size']/2):
+        raise ValueError(f'Error in Truncate Selection Method.')
+    new_pop: Population = generation.population.copy()
+    sorted(new_pop, key=lambda i: i.calculate_total_fitness(i))
+    new_pop = new_pop[param['k']:]
+    return choice(new_pop, size)
 
+# validators
+boltzmann_validator: ParamValidator = Schema({
+    'initial_temp': And(Or(float,int), lambda t0: t0 > 0),
+    'final_temp': And(Or(float,int), lambda tc: tc > 0),
+    'k': And(Or(float,int), lambda k: k > 0)
+}, ignore_extra_keys=True)
 
-def truncate_selector(generation: Generation):
-    return
+prob_tournament_validator: ParamValidator = Schema({
+    'tournament_probability': And(float, lambda p: 0.5 <= p <= 1)
+}, ignore_extra_keys=True)
 
+truncate_validator: ParamValidator = Schema({
+    'k': And(float, lambda k: k > 0)
+}, ignore_extra_keys=True)
 
-# TODO completar parámetros de las funciones
 selector_function: Dict[str, Tuple[InternalSelector, ParamValidator]] = {
     'elite': (elite_selector, None),
     'roulette': (roulette_selector, None),
     'rank': (rank_selector, None),
-    'boltzmann': (boltzmann_selector, None),  # TODO validador
-    'prob_tournament': (prob_tournament_selector, None),
-    'truncate': (truncate_selector, None)
+    'boltzmann': (boltzmann_selector, boltzmann_validator),
+    'prob_tournament': (prob_tournament_selector, prob_tournament_validator),
+    'truncate': (truncate_selector, truncate_validator)
 }
