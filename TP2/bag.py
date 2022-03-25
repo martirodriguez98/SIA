@@ -3,6 +3,7 @@ from typing import Set, List
 import numpy as np
 
 from data_loader import Item
+from generation import Population
 
 Individual = List[int]
 
@@ -31,9 +32,15 @@ class Bag:
 
     def calculate_total_fitness(self, individual: Individual) -> float:
         total_fitness: int = 0
-        for i,  e in zip(individual, self.items):
+        for i, e in zip(individual, self.items):
             if i:
                 total_fitness += e.fitness
+        return total_fitness
+
+    def population_fitness(self, population: Population):
+        total_fitness: int = 0
+        for i in population:
+            total_fitness += self.calculate_total_fitness(i)
         return total_fitness
 
     def generate_random_set(self) -> Individual:
