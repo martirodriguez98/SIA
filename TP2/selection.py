@@ -1,17 +1,35 @@
 import math
 import random
-from typing import Dict, Tuple, Callable, Collection, List
+from typing import Dict, Tuple, Callable, Collection, List, Optional, Any
 
 import numpy as np
 from numpy.random.mtrand import choice
 from schema import Schema, And, Or
 
 from bag import Bag, Individual
-from config_loader import Param, ParamValidator
+from config_loader import Param, ParamValidator, Config
 from generation import Generation, Population
 
-Selector = Callable[[Generation, Bag], Population]
-InternalSelector = Callable[[Generation, Param], Population]
+Selector = Callable[[Generation, Bag, int], Population]
+InternalSelector = Callable[[Generation, Bag, int, Param], Population]
+
+def validate_selector_params(params: Param) -> Param:
+    method_schema: Dict[Any, Any] = {
+        'name': And(str, Or(*tuple(selector_function.keys()))),
+        Optional['params']: dict
+    }
+    return Config.validate_param(params, Schema({
+        'selector': method_schema
+    },ignore_extra_keys=True))
+
+
+def get_selector(params: Param) -> Selector:
+    selector_params = validate_selector_params(params)
+    method, selection_param_schema = selector_function[params['selector']['name']]
+    validated_params: Param = (
+        Config.validate_param(params, selection_param_schema) if selection_param_schema else params
+    )
+    return lambda parents, amount: method(params,amount,validated_params)
 
 
 def get_individual_probs(population: Population, bag: Bag) -> Collection[float]:
@@ -22,7 +40,7 @@ def get_individual_probs(population: Population, bag: Bag) -> Collection[float]:
     return aux
 
 
-def elite_selector(generation: Generation) -> Population:
+def elite_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     return sorted(generation.population, key=lambda i: i.calculate_total_fitness(i), reverse=True)
 
 
@@ -30,10 +48,10 @@ def roulette_random_number(population: Population, bag: Bag, size: int) -> Popul
     return choice(population, size, p=get_individual_probs(population, bag))
 
 
-def roulette_selector(generation: Generation, bag: Bag, size: int) -> Population:
+def roulette_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     return roulette_random_number(generation.population, bag, size)
 
-def rank_selector(generation: Generation):
+def rank_selector(generation: Generation, bag: Bag, size: int, param: Param):
     return
 
 
@@ -110,3 +128,4 @@ selector_function: Dict[str, Tuple[InternalSelector, ParamValidator]] = {
     'prob_tournament': (prob_tournament_selector, prob_tournament_validator),
     'truncate': (truncate_selector, truncate_validator)
 }
+

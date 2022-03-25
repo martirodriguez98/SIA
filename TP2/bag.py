@@ -30,6 +30,7 @@ class Bag:
                 total_benefit += e.benefit
         return total_benefit
 
+    #todo bajar fitness a individuos que se pasan del peso maximo
     def calculate_total_fitness(self, individual: Individual) -> float:
         total_fitness: int = 0
         for i, e in zip(individual, self.items):
