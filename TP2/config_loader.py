@@ -34,9 +34,12 @@ class Config:
         args = Config.validate_param(args, Schema({
             'items_file': str,
             'population_size': schema.And(int, lambda population_size: population_size > 0),
-            'selector': dict
+            'selector': dict,
+            'crossover': dict
         }))
 
         self.items_file: str = args['items_file']
         self.population_size: int = args['population_size']
         self.selector: Param = args['selector']
+        self.crossover: Param = args['crossover']
+

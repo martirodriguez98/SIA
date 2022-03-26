@@ -8,7 +8,7 @@ from config_loader import Config
 from data_loader import Item
 from generation import Generation, Population
 from mutation import mutate
-from parent_crossing import cross_individuals
+from parent_crossing import get_crossover, Crossover
 from selection import Selector, get_selector
 
 
@@ -18,7 +18,7 @@ class Resolver:
         self.population_size: int = config.population_size
         self.current_generation = Generation.create_first_generation(self.bag, self.population_size)
         self.selector: Selector = get_selector(config.selector)
-        self.cross_method: Crossover = get_crossover(config.cross_method)
+        self.cross_method: Crossover = get_crossover(config.crossover)
         self.mutation_prob: Mutator =get_mutator(config.mutation_prob)
 
 
@@ -29,7 +29,7 @@ class Resolver:
             children = []
             while len(children) < self.population_size:
                 [first_parent, second_parent] = np.random.choice(self.current_generation.population,2, replace=False) #TODO check si es asi o con selector
-                [first_child, second_child] = cross_individuals(first_parent,second_parent,self.cross_method)
+                [first_child, second_child] = self.cross_method(first_parent,second_parent)
                 first_child = mutate(first_child,self.mutation_prob)
                 second_child = mutate(second_child,self.mutation_prob)
                 children.append(first_child)
