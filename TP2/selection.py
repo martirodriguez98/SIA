@@ -3,6 +3,7 @@ import random
 from typing import Dict, Tuple, Callable, Collection, List, Optional, Any
 
 import numpy as np
+import schema
 from numpy.random.mtrand import choice
 from schema import Schema, And, Or
 
@@ -16,37 +17,40 @@ InternalSelector = Callable[[Generation, Bag, int, Param], Population]
 def validate_selector_params(params: Param) -> Param:
     method_schema: Dict[Any, Any] = {
         'name': And(str, Or(*tuple(selector_function.keys()))),
-        Optional['params']: dict
+        schema.Optional('params', default=None): dict,
     }
     return Config.validate_param(params, Schema({
-        'selector': method_schema
+        'method': method_schema
     },ignore_extra_keys=True))
 
 
 def get_selector(params: Param) -> Selector:
-    selector_params = validate_selector_params(params)
-    method, selection_param_schema = selector_function[params['selector']['name']]
+    params = validate_selector_params(params)
+    method, selection_param_schema = selector_function[params['method']['name']]
     validated_params: Param = (
         Config.validate_param(params, selection_param_schema) if selection_param_schema else params
     )
-    return lambda parents, amount: method(params,amount,validated_params)
+    return lambda gen, bag, amount: method(gen, bag, amount,validated_params)
 
 
 def get_individual_probs(population: Population, bag: Bag) -> Collection[float]:
     aux: List = []
     population_fit = bag.population_fitness(population)
-    for i in population:
-        aux.append(bag.calculate_total_fitness(i) / population_fit)
+    for i in range(len(population)):
+        aux.append(bag.calculate_total_fitness(population[i]) / population_fit)
     return aux
 
 
 def elite_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
-    return sorted(generation.population, key=lambda i: i.calculate_total_fitness(i), reverse=True)
+    return sorted(generation.population, key=lambda i: bag.calculate_total_fitness(i), reverse=True)
 
 
 def roulette_random_number(population: Population, bag: Bag, size: int) -> Population:
-    return choice(population, size, p=get_individual_probs(population, bag))
-
+    result = np.random.choice(len(population), size, p=get_individual_probs(population, bag))
+    new_pop: Population = []
+    for r in range(len(result)):
+        new_pop.append(population[result[r]])
+    return new_pop
 
 def roulette_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     return roulette_random_number(generation.population, bag, size)

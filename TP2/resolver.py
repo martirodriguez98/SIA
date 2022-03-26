@@ -19,28 +19,35 @@ class Resolver:
         self.current_generation = Generation.create_first_generation(self.bag, self.population_size)
         self.selector: Selector = get_selector(config.selector)
         self.cross_method: Crossover = get_crossover(config.crossover)
-        self.mutation_prob: Mutator =get_mutator(config.mutation_prob)
-
+        self.mutation_prob: float = config.mutation_prob
 
     def bag_packer(self): #todo ver que retornar
-        while not self.stop_condition_met():
+        while not self.stop_condition_met(self.current_generation.gen_count):
             self.current_generation.gen_count += 1
-
             children = []
             while len(children) < self.population_size:
-                [first_parent, second_parent] = np.random.choice(self.current_generation.population,2, replace=False) #TODO check si es asi o con selector
+                parents = np.random.choice(len(self.current_generation.population),2, replace=False) #TODO check si es asi o con selector
+
+                first_parent = self.current_generation.population[parents[0]]
+                second_parent = self.current_generation.population[parents[1]]
                 [first_child, second_child] = self.cross_method(first_parent,second_parent)
                 first_child = mutate(first_child,self.mutation_prob)
                 second_child = mutate(second_child,self.mutation_prob)
                 children.append(first_child)
                 children.append(second_child)
 
-            children.extend(self.current_generation.population)
-            children = self.selector(children,self.population_size)
+            self.current_generation.population.extend(children)
+            aux = self.selector(self.current_generation, self.bag, self.population_size)
+            self.current_generation.population = aux[:]
 
-            for idx, individual in enumerate(children):
-                self.current_generation[idx] = individual
+        print(f'generation count: {self.current_generation.gen_count}\n')
+        for i in range(len(self.current_generation.population)):
+            print(f'total weight: {self.bag.calculate_weight(self.current_generation.population[i])}\n'
+                  f'total benefit: {self.bag.calculate_benefit(self.current_generation.population[i])}\n')
 
 
-    def stop_condition_met(self) -> bool:
-        return False
+
+
+
+    def stop_condition_met(self,gen_count: int) -> bool:
+        return gen_count == 4

@@ -5,7 +5,7 @@ import schema
 import yaml
 from schema import Schema, SchemaError
 
-Param = Dict[str, Any]
+Param = Optional[Dict[str, Any]]
 ParamValidator = Optional[Schema]
 
 
@@ -35,11 +35,13 @@ class Config:
             'items_file': str,
             'population_size': schema.And(int, lambda population_size: population_size > 0),
             'selector': dict,
-            'crossover': dict
+            'crossover': dict,
+            'mutation_prob': schema.And(float, lambda mutation_prob: 0 <= mutation_prob <=1 )
         }))
 
         self.items_file: str = args['items_file']
         self.population_size: int = args['population_size']
         self.selector: Param = args['selector']
         self.crossover: Param = args['crossover']
+        self.mutation_prob: float = args['mutation_prob']
 

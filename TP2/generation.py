@@ -1,9 +1,6 @@
 from typing import List
 
-import bag
-from bag import Bag
-
-Population = List[bag.Individual]
+from bag import Bag, Population
 
 
 class Generation:

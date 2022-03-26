@@ -1,5 +1,11 @@
 items_file: Mochila100Elementos.txt
 population_size: 8
 selector:
-  name:
-  params:
+  method:
+    name: roulette
+crossover:
+  method:
+    name: uniform
+    params:
+mutation_prob: 0.05
+
