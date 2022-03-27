@@ -22,7 +22,7 @@ class Resolver:
         self.mutation_prob: float = config.mutation_prob
 
     def bag_packer(self): #todo ver que retornar
-        while not self.stop_condition_met(self.current_generation.gen_count):
+        while not self.stop_condition_met(self.current_generation, self.bag):
             self.current_generation.gen_count += 1
             children = []
             while len(children) < self.population_size:
@@ -35,19 +35,25 @@ class Resolver:
                 second_child = mutate(second_child,self.mutation_prob)
                 children.append(first_child)
                 children.append(second_child)
-
+            self.current_generation.population.clear()
             self.current_generation.population.extend(children)
+
             aux = self.selector(self.current_generation, self.bag, self.population_size)
             self.current_generation.population = aux[:]
 
         print(f'generation count: {self.current_generation.gen_count}\n')
+        print(f'size pop: {len(self.current_generation.population)}')
         for i in range(len(self.current_generation.population)):
             print(f'total weight: {self.bag.calculate_weight(self.current_generation.population[i])}\n'
                   f'total benefit: {self.bag.calculate_benefit(self.current_generation.population[i])}\n')
 
 
-
-
-
-    def stop_condition_met(self,gen_count: int) -> bool:
-        return gen_count == 4
+    def stop_condition_met(self,gen: Generation, bag: Bag) -> bool:
+        if gen.gen_count > 500:
+            for i in range(len(gen.population)):
+                if bag.calculate_weight(gen.population[i]) <= bag.max_weight:
+                    print('EXITO')
+                    print(f'gen: {gen.gen_count}')
+                    print(f'total weight: {bag.calculate_weight(gen.population[i])}')
+                    return True
+        return False
