@@ -38,6 +38,8 @@ class Bag:
             if i:
                 total_fitness += e.fitness
             index+=1
+        if self.calculate_weight(individual) > self.max_weight:
+            total_fitness *= 0.3
         return total_fitness
 
     def population_fitness(self, population: Population):
