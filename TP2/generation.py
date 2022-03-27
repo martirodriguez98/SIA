@@ -17,3 +17,5 @@ class Generation:
     def __init__(self, population: Population, gen_count: int):
         self.population: Population = population
         self.gen_count: int = gen_count
+        self.best_fitness: float = 0
+        self.cont_same_fitness: int = 0

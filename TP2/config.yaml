@@ -1,5 +1,5 @@
 items_file: Mochila100Elementos.txt
-population_size: 8
+population_size: 10
 selector:
   method:
     name: roulette

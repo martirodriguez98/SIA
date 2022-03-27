@@ -21,18 +21,25 @@ class Resolver:
         self.cross_method: Crossover = get_crossover(config.crossover)
         self.mutation_prob: float = config.mutation_prob
 
-    def bag_packer(self): #todo ver que retornar
+    def bag_packer(self):  # todo ver que retornar
         while not self.stop_condition_met(self.current_generation, self.bag):
             self.current_generation.gen_count += 1
+            best_fit: float = self.bag.best_fitness(self.current_generation.population)
+            if round(self.current_generation.best_fitness) == round(best_fit):
+                self.current_generation.cont_same_fitness += 1
+            else:
+                self.current_generation.cont_same_fitness = 0
+                self.current_generation.best_fitness = best_fit
             children = []
             while len(children) < self.population_size:
-                parents = np.random.choice(len(self.current_generation.population),2, replace=False) #TODO check si es asi o con selector
+                parents = np.random.choice(len(self.current_generation.population), 2,
+                                           replace=False)  # TODO check si es asi o con selector
 
                 first_parent = self.current_generation.population[parents[0]]
                 second_parent = self.current_generation.population[parents[1]]
-                [first_child, second_child] = self.cross_method(first_parent,second_parent)
-                first_child = mutate(first_child,self.mutation_prob)
-                second_child = mutate(second_child,self.mutation_prob)
+                [first_child, second_child] = self.cross_method(first_parent, second_parent)
+                first_child = mutate(first_child, self.mutation_prob)
+                second_child = mutate(second_child, self.mutation_prob)
                 children.append(first_child)
                 children.append(second_child)
             self.current_generation.population.clear()
@@ -47,13 +54,16 @@ class Resolver:
             print(f'total weight: {self.bag.calculate_weight(self.current_generation.population[i])}\n'
                   f'total benefit: {self.bag.calculate_benefit(self.current_generation.population[i])}\n')
 
-
-    def stop_condition_met(self,gen: Generation, bag: Bag) -> bool:
+    def stop_condition_met(self, gen: Generation, bag: Bag) -> bool:
         if gen.gen_count > 500:
-            for i in range(len(gen.population)):
-                if bag.calculate_weight(gen.population[i]) <= bag.max_weight:
-                    print('EXITO')
-                    print(f'gen: {gen.gen_count}')
-                    print(f'total weight: {bag.calculate_weight(gen.population[i])}')
-                    return True
+            if gen.cont_same_fitness > 5:
+                print(f'ENTREEEEEEEEEEEEEE y gane en la generación: {gen.gen_count}')
+                return True
+            else:
+                for i in range(len(gen.population)):
+                    if bag.calculate_weight(gen.population[i]) <= bag.max_weight:
+                        print('EXITO')
+                        print(f'gen: {gen.gen_count}')
+                        print(f'total weight: {bag.calculate_weight(gen.population[i])}')
+                        return True
         return False
