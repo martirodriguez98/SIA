@@ -1,4 +1,4 @@
-from random import random
+from random import sample
 from typing import Callable, Iterator, Dict, Optional, Tuple
 
 import numpy as np
@@ -28,27 +28,30 @@ def get_crossover(params: Param) -> Crossover:
     return lambda first, second: method(first,second,crossover_params)
 
 def get_single_point(first_parent: Individual, second_parent: Individual, param: Param) -> Tuple[Individual,Individual]:
-    return get_multiple_point(first_parent,second_parent,param)
+    return aux_get_multiple_point(first_parent,second_parent,1)
 
 def get_multiple_point(first_parent: Individual, second_parent: Individual, param: Param) -> Tuple[Individual,Individual]:
+    return aux_get_multiple_point(first_parent,second_parent,param['points_q'])
+
+def aux_get_multiple_point(first_parent: Individual, second_parent: Individual,points_q: int) -> Tuple[Individual,Individual]:
     size = len(first_parent)
     first_child: Individual = []
     second_child: Individual = []
-    points_q:int = param['points_q']
     if points_q > size:
         raise ValueError('Error in get multiple point function. Points_q must be lower than population size')
-    p = sorted(np.random.sample(range(1,size),points_q))
+    p = sample(range(1,len(first_parent) - 1),points_q)
+    p.sort()
+
     switches: int = 0
     for i in range(size):
         if switches < points_q and i == p[switches]:
             switches += 1
         if switches % 2 == 0:
-            first_child[i] = first_parent[i]
-            second_child[i] = second_parent[i]
+            first_child.insert(i,first_parent[i])
+            second_child.insert(i,second_parent[i])
         else:
-            first_child[i] = second_parent[i]
-            second_child[i] = first_parent[i]
-
+            first_child.insert(i,second_parent[i])
+            second_child.insert(i, first_parent[i])
     return first_child,second_child
 
 def get_uniform(first_parent: Individual, second_parent: Individual, param: Param) -> Tuple[Individual,Individual]:
