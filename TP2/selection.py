@@ -44,7 +44,6 @@ def get_individual_probs(population: Population, bag: Bag) -> Collection[float]:
 def elite_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     return sorted(generation.population, key=lambda i: bag.calculate_total_fitness(i), reverse=True)
 
-
 def roulette_random_number(population: Population, bag: Bag, size: int) -> Population:
     result = np.random.choice(len(population), size, p=get_individual_probs(population, bag))
     new_pop: Population = []
@@ -55,9 +54,12 @@ def roulette_random_number(population: Population, bag: Bag, size: int) -> Popul
 def roulette_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     return roulette_random_number(generation.population, bag, size)
 
-def rank_selector(generation: Generation, bag: Bag, size: int, param: Param):
-    return
-
+def rank_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
+    sorted_pop = sorted(generation.population, key=lambda ind: bag.calculate_total_fitness(ind),reverse=True)
+    weights = []
+    for i in range(size):
+        weights.append((size - (i+1)) / size)
+    return random.choices(population=sorted_pop, weights=weights,k=size)
 
 def get_prob(prob_list: np.ndarray) -> Collection[float]:
     return np.cumsum(prob_list / prob_list.sum())

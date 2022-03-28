@@ -1,6 +1,7 @@
 import sys
 from typing import List, Tuple
 
+
 from bag import Bag
 from data_loader import Item, load_data
 from resolver import Resolver

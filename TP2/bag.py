@@ -32,7 +32,7 @@ class Bag:
 
     # todo bajar fitness a individuos que se pasan del peso maximo
     def calculate_total_fitness(self, individual: Individual) -> float:
-        total_fitness: int = 0
+        total_fitness: float = 0
         index = 0
         for i, e in zip(individual, self.items):
             if i:

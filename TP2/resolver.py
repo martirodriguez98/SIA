@@ -56,14 +56,14 @@ class Resolver:
 
     def stop_condition_met(self, gen: Generation, bag: Bag) -> bool:
         if gen.gen_count > 500:
-            if gen.cont_same_fitness > 5:
-                print(f'ENTREEEEEEEEEEEEEE y gane en la generación: {gen.gen_count}')
-                return True
-            else:
-                for i in range(len(gen.population)):
-                    if bag.calculate_weight(gen.population[i]) <= bag.max_weight:
-                        print('EXITO')
-                        print(f'gen: {gen.gen_count}')
-                        print(f'total weight: {bag.calculate_weight(gen.population[i])}')
-                        return True
+            # if gen.cont_same_fitness > 5:
+            #     print(f'ENTREEEEEEEEEEEEEE y gane en la generación: {gen.gen_count}')
+            #     return True
+            # else:
+            for i in range(len(gen.population)):
+                if bag.calculate_weight(gen.population[i]) <= bag.max_weight:
+                    print('EXITO')
+                    print(f'gen: {gen.gen_count}')
+                    print(f'total weight: {bag.calculate_weight(gen.population[i])}')
+                    return True
         return False
