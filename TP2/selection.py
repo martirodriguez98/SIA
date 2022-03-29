@@ -26,10 +26,12 @@ def validate_selector_params(params: Param) -> Param:
 
 def get_selector(params: Param) -> Selector:
     params = validate_selector_params(params)
-    method, selection_param_schema = selector_function[params['method']['name']]
+    method,selection_param_schema = selector_function[params['method']['name']]
+
     validated_params: Param = (
         Config.validate_param(params, selection_param_schema) if selection_param_schema else params
     )
+
     return lambda gen, bag, amount: method(gen, bag, amount,validated_params)
 
 
@@ -57,8 +59,9 @@ def roulette_selector(generation: Generation, bag: Bag, size: int, param: Param)
 def rank_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     sorted_pop = sorted(generation.population, key=lambda ind: bag.calculate_total_fitness(ind),reverse=True)
     weights = []
-    for i in range(size):
-        weights.append((size - (i+1)) / size)
+    pop_size = len(generation.population)
+    for i in range(pop_size):
+        weights.append((pop_size - (i+1)) / pop_size)
     return random.choices(population=sorted_pop, weights=weights,k=size)
 
 def get_prob(prob_list: np.ndarray) -> Collection[float]:
