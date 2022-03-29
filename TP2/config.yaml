@@ -3,8 +3,14 @@ population_size: 10
 selector:
   method:
     name: elite
+    params:
+      initial_temp: 20
+      final_temp: 10
+      k: 0.2
 crossover:
   method:
     name: uniform
-    params:
-mutation_prob: 0.05
+
+
+
+mutation_prob: 0.005

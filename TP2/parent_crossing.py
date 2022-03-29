@@ -15,14 +15,18 @@ MethodSelector = Callable[[Individual,Individual,Param], Tuple[Individual,Indivi
 def validate_params(params: Param) -> Param:
     return Config.validate_param(params, Schema({
         'method': {
-            'name': And(str, Or(*tuple(crossing_function.keys())))
+            'name': And(str, Or(*tuple(crossing_function.keys()))),
         }
     }, ignore_extra_keys=True))
 
 def get_crossover(params: Param) -> Crossover:
     validate_params(params)
     method, crossover_params_schema = crossing_function[params['method']['name']]
-    crossover_params: Param = params['method']['params']
+    crossover_params: Param
+    try:
+        crossover_params = params['method']['params']
+    except:
+        crossover_params = None
     if crossover_params_schema:
         crossover_params = Config.validate_param(crossover_params,crossover_params_schema)
     return lambda first, second: method(first,second,crossover_params)

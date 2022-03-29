@@ -15,6 +15,7 @@ Selector = Callable[[Generation, Bag, int], Population]
 InternalSelector = Callable[[Generation, Bag, int, Param], Population]
 
 def validate_selector_params(params: Param) -> Param:
+
     method_schema: Dict[Any, Any] = {
         'name': And(str, Or(*tuple(selector_function.keys()))),
         schema.Optional('params', default=None): dict,
@@ -25,9 +26,9 @@ def validate_selector_params(params: Param) -> Param:
 
 
 def get_selector(params: Param) -> Selector:
+    # validate_selector_params(params)
     params = validate_selector_params(params)
     method,selection_param_schema = selector_function[params['method']['name']]
-
     validated_params: Param = (
         Config.validate_param(params, selection_param_schema) if selection_param_schema else params
     )
