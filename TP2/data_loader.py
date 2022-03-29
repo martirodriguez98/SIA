@@ -8,7 +8,6 @@ class Item:
         self.benefit: int = benefit
         self.weight: int = weight
         self.selected: int = 0
-        self.fitness: float = self.benefit / self.weight
 
     def __repr__(self):
         return f'benefit: {self.benefit}, weight: {self.weight}'

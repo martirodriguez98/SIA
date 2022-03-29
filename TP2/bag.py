@@ -32,15 +32,19 @@ class Bag:
 
     # todo bajar fitness a individuos que se pasan del peso maximo
     def calculate_total_fitness(self, individual: Individual) -> float:
-        total_fitness: float = 0
-        index = 0
+        weight = 0
+        benefit = 0
         for i, e in zip(individual, self.items):
             if i:
-                total_fitness += e.fitness
-            index += 1
-        if self.calculate_weight(individual) > self.max_weight:
-            total_fitness *= 0.3
-        return total_fitness
+                weight += e.weight
+                benefit += e.benefit
+        # print(individual)
+        if weight > self.max_weight:
+            weight = weight * (weight - self.max_weight)
+            # print(f'malo: {benefit/weight}')
+            return benefit / weight
+        # print(f'bueno: {benefit}')
+        return benefit
 
     def population_fitness(self, population: Population):
         total_fitness: float = 0
@@ -77,3 +81,4 @@ class Bag:
             indexes.pop(index)
 
         return individual
+

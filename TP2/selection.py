@@ -42,7 +42,7 @@ def get_individual_probs(population: Population, bag: Bag) -> Collection[float]:
 
 
 def elite_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
-    return sorted(generation.population, key=lambda i: bag.calculate_total_fitness(i), reverse=True)
+    return sorted(generation.population, key=lambda i: bag.calculate_total_fitness(i), reverse=True)[0:size]
 
 def roulette_random_number(population: Population, bag: Bag, size: int) -> Population:
     result = np.random.choice(len(population), size, p=get_individual_probs(population, bag))
