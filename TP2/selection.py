@@ -83,26 +83,15 @@ def calculate_boltzmann(generation: Generation, bag: Bag, k: float, t0: float, t
 
     new_fitness = []
     total_fitness = 0
-    print(len(generation.population))
     for ind in generation.population:
-        aux = bag.calculate_total_fitness(ind) * 0.3
-        print(f'fit: {bag.calculate_total_fitness(ind)} - t: {t}')
+        aux = bag.calculate_total_fitness(ind) / 100 #dividimos por 100 porque hay fitness que son muy grandes y la exponencial no da
         f = math.exp(aux / t)
-        print(f'f: {f}')
         new_fitness.append(f)
         total_fitness += f
 
     for f in range(len(new_fitness)):
         new_fitness[f] = new_fitness[f] / total_fitness
-        print(f'new fitness: {new_fitness[f]}')
     return new_fitness
-
-    # fitness_list: np.ndarray = np.fromiter(
-    #     map(lambda i: math.exp(bag.calculate_total_fitness(i) / t), generation.population), float)
-    # mean = np.mean(fitness_list)
-    # boltzmann_fitness_list = fitness_list / mean
-    # return get_prob(boltzmann_fitness_list)
-
 
 def boltzmann_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     result = choice(len(generation.population), size,
@@ -111,15 +100,6 @@ def boltzmann_selector(generation: Generation, bag: Bag, size: int, param: Param
     for r in range(len(result)):
         new_pop.append(generation.population[result[r]])
     return new_pop
-
-
-# print(calculate_boltzmann(generation, bag, param['k'], param['initial_temp'], param['final_temp']))
-# print('suma')
-# suma = 0.0
-# for a in calculate_boltzmann(generation, bag, param['k'], param['initial_temp'], param['final_temp']):
-#     suma+=a
-# print(suma)
-# return choice(len(generation.population), size, p=calculate_boltzmann(generation, bag, param['k'], param['initial_temp'], param['final_temp']))
 
 def fitness_key(i: Individual, bag: Bag) -> float:
     return bag.calculate_total_fitness(i)
