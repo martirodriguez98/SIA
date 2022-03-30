@@ -36,7 +36,7 @@ class Config:
             'population_size': schema.And(int, lambda population_size: population_size > 0),
             'selector': dict,
             'crossover': dict,
-            'mutation_prob': schema.And(float, lambda mutation_prob: 0 <= mutation_prob <=1 )
+            'mutation_prob': schema.And(float, lambda mutation_prob: 0 <= mutation_prob <= 1)
         }))
 
         self.items_file: str = args['items_file']
@@ -44,4 +44,3 @@ class Config:
         self.selector: Param = args['selector']
         self.crossover: Param = args['crossover']
         self.mutation_prob: float = args['mutation_prob']
-

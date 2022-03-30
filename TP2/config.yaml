@@ -2,9 +2,9 @@ items_file: Mochila100Elementos.txt
 population_size: 12
 selector:
   method:
-    name: truncate
+    name: prob_tournament
     params:
-      k: 5
+      tournament_probability: 0.75
 crossover:
   method:
     name: uniform

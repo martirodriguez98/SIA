@@ -1,9 +1,8 @@
 import math
 import random
-from typing import Dict, Tuple, Callable, Collection, List, Optional, Any
+from typing import Dict, Tuple, Callable, Collection, List, Set
 
 import numpy as np
-import schema
 from numpy.random.mtrand import choice
 from schema import Schema, And, Or
 
@@ -84,7 +83,8 @@ def calculate_boltzmann(generation: Generation, bag: Bag, k: float, t0: float, t
     new_fitness = []
     total_fitness = 0
     for ind in generation.population:
-        aux = bag.calculate_total_fitness(ind) / 100 #dividimos por 100 porque hay fitness que son muy grandes y la exponencial no da
+        aux = bag.calculate_total_fitness(
+            ind) / 100  # dividimos por 100 porque hay fitness que son muy grandes y la exponencial no da
         f = math.exp(aux / t)
         new_fitness.append(f)
         total_fitness += f
@@ -92,6 +92,7 @@ def calculate_boltzmann(generation: Generation, bag: Bag, k: float, t0: float, t
     for f in range(len(new_fitness)):
         new_fitness[f] = new_fitness[f] / total_fitness
     return new_fitness
+
 
 def boltzmann_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     result = choice(len(generation.population), size,
@@ -101,16 +102,21 @@ def boltzmann_selector(generation: Generation, bag: Bag, size: int, param: Param
         new_pop.append(generation.population[result[r]])
     return new_pop
 
-def fitness_key(i: Individual, bag: Bag) -> float:
-    return bag.calculate_total_fitness(i)
-
 
 def probabilistic_selection(population: Population, bag: Bag, tournament_prob: float) -> Individual:
     rand: float = random.uniform(0, 1)
+    fitness_1: float = bag.calculate_total_fitness(population[0])
+    fitness_2: float = bag.calculate_total_fitness(population[1])
     if rand < tournament_prob:
-        return max(population, key=fitness_key)  # TODO check if it's working
+        if fitness_1 > fitness_2:
+            return population[0]
+        else:
+            return population[1]
     else:
-        return min(population, key=fitness_key)
+        if fitness_1 < fitness_2:
+            return population[0]
+        else:
+            return population[1]
 
 
 def tournament_winner(population: Population, bag: Bag, tournament_prob: float) -> Individual:
@@ -122,10 +128,10 @@ def tournament_winner(population: Population, bag: Bag, tournament_prob: float) 
 
 
 def prob_tournament_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
-    return [
-        tournament_winner(generation.population, bag, param['tournament_probability'])
-        for _ in range(size)
-    ]
+    winners: Set = set()
+    while len(winners) < size:
+        winners.add(tuple(tournament_winner(generation.population, bag, param['tournament_probability'])))
+    return list(winners)
 
 
 def truncate_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:

@@ -1,4 +1,4 @@
-from typing import Set, List
+from typing import List
 
 import numpy as np
 
@@ -30,7 +30,6 @@ class Bag:
                 total_benefit += e.benefit
         return total_benefit
 
-    # todo bajar fitness a individuos que se pasan del peso maximo
     def calculate_total_fitness(self, individual: Individual) -> float:
         weight = 0
         benefit = 0
@@ -38,12 +37,9 @@ class Bag:
             if i:
                 weight += e.weight
                 benefit += e.benefit
-        # print(individual)
         if weight > self.max_weight:
             weight = weight * (weight - self.max_weight)
-            # print(f'malo: {benefit/weight}')
             return benefit / weight
-        # print(f'bueno: {benefit}')
         return benefit
 
     def population_fitness(self, population: Population):
@@ -81,4 +77,3 @@ class Bag:
             indexes.pop(index)
 
         return individual
-
