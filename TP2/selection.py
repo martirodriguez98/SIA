@@ -14,28 +14,29 @@ from generation import Generation, Population
 Selector = Callable[[Generation, Bag, int], Population]
 InternalSelector = Callable[[Generation, Bag, int, Param], Population]
 
+
 def validate_selector_params(params: Param) -> Param:
     return Config.validate_param(params, Schema({
-        'method':{
-            'name':And(str, Or(*tuple(selector_function.keys()))),
+        'method': {
+            'name': And(str, Or(*tuple(selector_function.keys()))),
         }
-    },ignore_extra_keys=True))
+    }, ignore_extra_keys=True))
 
 
 def get_selector(params: Param) -> Selector:
     validate_selector_params(params)
-    method,selection_param_schema = selector_function[params['method']['name']]
-    validated_params : Param
+    method, selection_param_schema = selector_function[params['method']['name']]
+    validated_params: Param
     try:
-        validated_params=params['method']['params']
+        validated_params = params['method']['params']
     except:
-        validated_params=None
+        validated_params = None
     if selection_param_schema:
-        validated_params = Config.validate_param(validated_params,selection_param_schema)
+        validated_params = Config.validate_param(validated_params, selection_param_schema)
     # validated_params: Param = (
     #     Config.validate_param(params, selection_param_schema) if selection_param_schema else params
     # )
-    return lambda gen, bag, amount: method(gen, bag, amount,validated_params)
+    return lambda gen, bag, amount: method(gen, bag, amount, validated_params)
 
 
 def get_individual_probs(population: Population, bag: Bag) -> Collection[float]:
@@ -49,6 +50,7 @@ def get_individual_probs(population: Population, bag: Bag) -> Collection[float]:
 def elite_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     return sorted(generation.population, key=lambda i: bag.calculate_total_fitness(i), reverse=True)[0:size]
 
+
 def roulette_random_number(population: Population, bag: Bag, size: int) -> Population:
     result = np.random.choice(len(population), size, p=get_individual_probs(population, bag))
     new_pop: Population = []
@@ -56,16 +58,19 @@ def roulette_random_number(population: Population, bag: Bag, size: int) -> Popul
         new_pop.append(population[result[r]])
     return new_pop
 
+
 def roulette_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     return roulette_random_number(generation.population, bag, size)
 
+
 def rank_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
-    sorted_pop = sorted(generation.population, key=lambda ind: bag.calculate_total_fitness(ind),reverse=True)
+    sorted_pop = sorted(generation.population, key=lambda ind: bag.calculate_total_fitness(ind), reverse=True)
     weights = []
     pop_size = len(generation.population)
     for i in range(pop_size):
-        weights.append((pop_size - (i+1)) / pop_size)
-    return random.choices(population=sorted_pop, weights=weights,k=size)
+        weights.append((pop_size - (i + 1)) / pop_size)
+    return random.choices(population=sorted_pop, weights=weights, k=size)
+
 
 def get_prob(prob_list: np.ndarray) -> Collection[float]:
     return np.cumsum(prob_list / prob_list.sum())
@@ -80,16 +85,16 @@ def calculate_boltzmann(generation: Generation, bag: Bag, k: float, t0: float, t
     total_fitness = 0
     print(len(generation.population))
     for ind in generation.population:
-
+        aux = bag.calculate_total_fitness(ind) * 0.3
         print(f'fit: {bag.calculate_total_fitness(ind)} - t: {t}')
-        f = math.exp(bag.calculate_total_fitness(ind) / t)
+        f = math.exp(aux / t)
         print(f'f: {f}')
         new_fitness.append(f)
         total_fitness += f
 
     for f in range(len(new_fitness)):
         new_fitness[f] = new_fitness[f] / total_fitness
-
+        print(f'new fitness: {new_fitness[f]}')
     return new_fitness
 
     # fitness_list: np.ndarray = np.fromiter(
@@ -100,11 +105,13 @@ def calculate_boltzmann(generation: Generation, bag: Bag, k: float, t0: float, t
 
 
 def boltzmann_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
-    result = choice(len(generation.population), size, p=calculate_boltzmann(generation, bag, param['k'], param['initial_temp'], param['final_temp']))
+    result = choice(len(generation.population), size,
+                    p=calculate_boltzmann(generation, bag, param['k'], param['initial_temp'], param['final_temp']))
     new_pop: Population = []
     for r in range(len(result)):
         new_pop.append(generation.population[result[r]])
     return new_pop
+
 
 # print(calculate_boltzmann(generation, bag, param['k'], param['initial_temp'], param['final_temp']))
 # print('suma')
@@ -117,40 +124,45 @@ def boltzmann_selector(generation: Generation, bag: Bag, size: int, param: Param
 def fitness_key(i: Individual, bag: Bag) -> float:
     return bag.calculate_total_fitness(i)
 
-def probabilistic_selection(population: Population,bag: Bag, tournament_prob: float) -> Individual:
-    rand: float = random.uniform(0,1)
+
+def probabilistic_selection(population: Population, bag: Bag, tournament_prob: float) -> Individual:
+    rand: float = random.uniform(0, 1)
     if rand < tournament_prob:
-        return max(population, key=fitness_key) #TODO check if it's working
+        return max(population, key=fitness_key)  # TODO check if it's working
     else:
         return min(population, key=fitness_key)
 
-def tournament_winner(population: Population,bag: Bag, tournament_prob: float) -> Individual:
+
+def tournament_winner(population: Population, bag: Bag, tournament_prob: float) -> Individual:
     winners = [
-        probabilistic_selection(random.sample(population,2),bag,tournament_prob),
-        probabilistic_selection(random.sample(population,2),bag,tournament_prob)
+        probabilistic_selection(random.sample(population, 2), bag, tournament_prob),
+        probabilistic_selection(random.sample(population, 2), bag, tournament_prob)
     ]
-    return probabilistic_selection(winners,bag,tournament_prob)
+    return probabilistic_selection(winners, bag, tournament_prob)
+
 
 def prob_tournament_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     return [
-        tournament_winner(generation.population,bag,param['tournament_probability'])
+        tournament_winner(generation.population, bag, param['tournament_probability'])
         for _ in range(size)
     ]
 
 
 def truncate_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
-    if param['k'] >= math.floor(param['population_size']/2):
+    if param['k'] >= math.floor(size / 2):
         raise ValueError(f'Error in Truncate Selection Method.')
     new_pop: Population = generation.population.copy()
-    sorted(new_pop, key=lambda i: i.calculate_total_fitness(i))
+    sorted(new_pop, key=lambda i: bag.calculate_total_fitness(i))
     new_pop = new_pop[param['k']:]
-    return choice(new_pop, size)
+    print(new_pop)
+    return generation.population
+
 
 # validators
 boltzmann_validator: ParamValidator = Schema({
-    'initial_temp': And(Or(float,int), lambda t0: t0 > 0),
-    'final_temp': And(Or(float,int), lambda tc: tc > 0),
-    'k': And(Or(float,int), lambda k: k > 0)
+    'initial_temp': And(Or(float, int), lambda t0: t0 > 0),
+    'final_temp': And(Or(float, int), lambda tc: tc > 0),
+    'k': And(Or(float, int), lambda k: k > 0)
 }, ignore_extra_keys=True)
 
 prob_tournament_validator: ParamValidator = Schema({
@@ -158,7 +170,7 @@ prob_tournament_validator: ParamValidator = Schema({
 }, ignore_extra_keys=True)
 
 truncate_validator: ParamValidator = Schema({
-    'k': And(float, lambda k: k > 0)
+    'k': And(int, lambda k: k > 0)
 }, ignore_extra_keys=True)
 
 selector_function: Dict[str, Tuple[InternalSelector, ParamValidator]] = {
@@ -169,4 +181,3 @@ selector_function: Dict[str, Tuple[InternalSelector, ParamValidator]] = {
     'prob_tournament': (prob_tournament_selector, prob_tournament_validator),
     'truncate': (truncate_selector, truncate_validator)
 }
-

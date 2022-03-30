@@ -57,7 +57,6 @@ class Resolver:
                 print(self.bag.calculate_total_fitness(i))
             print("----------")
             gen_aux = Generation(cur_gen_list,self.current_generation.gen_count)
-
             aux = self.selector(gen_aux,self.bag,self.population_size)
             self.current_generation.population.clear()
             for i in aux:
