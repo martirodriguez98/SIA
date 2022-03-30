@@ -15,24 +15,26 @@ Selector = Callable[[Generation, Bag, int], Population]
 InternalSelector = Callable[[Generation, Bag, int, Param], Population]
 
 def validate_selector_params(params: Param) -> Param:
-
-    method_schema: Dict[Any, Any] = {
-        'name': And(str, Or(*tuple(selector_function.keys()))),
-        schema.Optional('params', default=None): dict,
-    }
     return Config.validate_param(params, Schema({
-        'method': method_schema
+        'method':{
+            'name':And(str, Or(*tuple(selector_function.keys()))),
+        }
     },ignore_extra_keys=True))
 
 
 def get_selector(params: Param) -> Selector:
-    # validate_selector_params(params)
-    params = validate_selector_params(params)
+    validate_selector_params(params)
     method,selection_param_schema = selector_function[params['method']['name']]
-    validated_params: Param = (
-        Config.validate_param(params, selection_param_schema) if selection_param_schema else params
-    )
-
+    validated_params : Param
+    try:
+        validated_params=params['method']['params']
+    except:
+        validated_params=None
+    if selection_param_schema:
+        validated_params = Config.validate_param(validated_params,selection_param_schema)
+    # validated_params: Param = (
+    #     Config.validate_param(params, selection_param_schema) if selection_param_schema else params
+    # )
     return lambda gen, bag, amount: method(gen, bag, amount,validated_params)
 
 
@@ -72,16 +74,45 @@ def get_prob(prob_list: np.ndarray) -> Collection[float]:
 def calculate_boltzmann(generation: Generation, bag: Bag, k: float, t0: float, tc: float) -> Collection[float]:
     if tc >= t0:
         raise ValueError(f'Error in Boltzmann Selection Method')
-    t: float = tc + (t0 - tc) * math.exp(-k * generation.gen_count)
-    fitness_list: np.ndarray = np.fromiter(
-        map(lambda i: math.exp(bag.calculate_total_fitness(i) / t), generation.population), float)
-    mean = np.mean(fitness_list)
-    boltzmann_fitness_list = fitness_list / mean
-    return get_prob(boltzmann_fitness_list)
+    t: float = tc + (t0 - tc) * (math.e ** (-k * generation.gen_count))
+
+    new_fitness = []
+    total_fitness = 0
+    print(len(generation.population))
+    for ind in generation.population:
+
+        print(f'fit: {bag.calculate_total_fitness(ind)} - t: {t}')
+        f = math.exp(bag.calculate_total_fitness(ind) / t)
+        print(f'f: {f}')
+        new_fitness.append(f)
+        total_fitness += f
+
+    for f in range(len(new_fitness)):
+        new_fitness[f] = new_fitness[f] / total_fitness
+
+    return new_fitness
+
+    # fitness_list: np.ndarray = np.fromiter(
+    #     map(lambda i: math.exp(bag.calculate_total_fitness(i) / t), generation.population), float)
+    # mean = np.mean(fitness_list)
+    # boltzmann_fitness_list = fitness_list / mean
+    # return get_prob(boltzmann_fitness_list)
 
 
 def boltzmann_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
-    return choice(generation.population, size, p=calculate_boltzmann(generation, bag, param['k'], param['initial_temp'], param['final_temp']))
+    result = choice(len(generation.population), size, p=calculate_boltzmann(generation, bag, param['k'], param['initial_temp'], param['final_temp']))
+    new_pop: Population = []
+    for r in range(len(result)):
+        new_pop.append(generation.population[result[r]])
+    return new_pop
+
+# print(calculate_boltzmann(generation, bag, param['k'], param['initial_temp'], param['final_temp']))
+# print('suma')
+# suma = 0.0
+# for a in calculate_boltzmann(generation, bag, param['k'], param['initial_temp'], param['final_temp']):
+#     suma+=a
+# print(suma)
+# return choice(len(generation.population), size, p=calculate_boltzmann(generation, bag, param['k'], param['initial_temp'], param['final_temp']))
 
 def fitness_key(i: Individual, bag: Bag) -> float:
     return bag.calculate_total_fitness(i)
