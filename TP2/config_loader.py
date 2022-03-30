@@ -8,7 +8,6 @@ from schema import Schema, SchemaError
 Param = Optional[Dict[str, Any]]
 ParamValidator = Optional[Schema]
 
-
 class Config:
 
     @staticmethod
@@ -36,7 +35,8 @@ class Config:
             'population_size': schema.And(int, lambda population_size: population_size > 0),
             'selector': dict,
             'crossover': dict,
-            'mutation_prob': schema.And(float, lambda mutation_prob: 0 <= mutation_prob <= 1)
+            'mutation_prob': schema.And(float, lambda mutation_prob: 0 <= mutation_prob <=1 ),
+            'stop_condition': schema.Or(dict,None)
         }))
 
         self.items_file: str = args['items_file']
@@ -44,3 +44,4 @@ class Config:
         self.selector: Param = args['selector']
         self.crossover: Param = args['crossover']
         self.mutation_prob: float = args['mutation_prob']
+        self.stop_condition: Param = args['stop_condition']

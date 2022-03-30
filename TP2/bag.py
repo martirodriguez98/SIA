@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 
@@ -42,19 +42,31 @@ class Bag:
             return benefit / weight
         return benefit
 
-    def population_fitness(self, population: Population):
+    def population_fitness(self, population: Population) -> float:
         total_fitness: float = 0
         for i in range(len(population)):
             total_fitness += self.calculate_total_fitness(population[i])
         return total_fitness
 
-    def best_fitness(self, population: Population):
+    def best_fitness(self, population: Population) -> float:
         best_fitness: float = 0
         for i in range(len(population)):
             aux: float = self.calculate_total_fitness(population[i])
             if aux > best_fitness:
                 best_fitness = aux
         return best_fitness
+
+    def best_individual(self, population: Population) -> Tuple[Individual,float,int]:
+        best_fitness: float = 0
+        ind: Individual = []
+        weight: int = 0
+        for i in range(len(population)):
+            aux: float = self.calculate_total_fitness(population[i])
+            if aux > best_fitness:
+                best_fitness = aux
+                ind = population[i]
+                weight = self.calculate_weight(population[i])
+        return ind,best_fitness,weight
 
     def generate_random_set(self) -> Individual:
         current_weight = 0

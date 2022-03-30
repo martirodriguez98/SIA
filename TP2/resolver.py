@@ -5,6 +5,7 @@ from generation import Generation
 from mutation import mutate
 from parent_crossing import get_crossover, Crossover
 from selection import Selector, get_selector
+from stop_condition import StopCondition, get_stop_condition, stop_condition_met, update_changed_population
 
 
 class Resolver:
@@ -15,10 +16,12 @@ class Resolver:
         self.selector: Selector = get_selector(config.selector)
         self.cross_method: Crossover = get_crossover(config.crossover)
         self.mutation_prob: float = config.mutation_prob
+        self.stop_condition: StopCondition = get_stop_condition(config.stop_condition)
 
     def bag_packer(self):
-        while not self.stop_condition_met(self.current_generation, self.bag):
+        self.stop_condition.repeated_individuals = self.current_generation.population.copy()
 
+        while not stop_condition_met(self.stop_condition,self.current_generation, self.bag):
             self.current_generation.gen_count += 1
             best_fit: float = self.bag.best_fitness(self.current_generation.population)
             if self.current_generation.best_fitness == best_fit:
@@ -46,14 +49,13 @@ class Resolver:
             for i in new_gen:
                 cur_gen_list.append(list(i))
 
-            for i in cur_gen_list:
-                print(self.bag.calculate_total_fitness(i))
-            print("----------")
             gen_aux = Generation(cur_gen_list, self.current_generation.gen_count)
             aux = self.selector(gen_aux, self.bag, self.population_size)
             self.current_generation.population.clear()
             for i in aux:
                 self.current_generation.population.append(i)
+
+            update_changed_population(self.stop_condition, self.current_generation, self.bag)
 
         print(f'generation count: {self.current_generation.gen_count}\n')
         print(f'size pop: {len(self.current_generation.population)}')
@@ -61,16 +63,3 @@ class Resolver:
             print(f'total weight: {self.bag.calculate_weight(self.current_generation.population[i])}\n'
                   f'total benefit: {self.bag.calculate_benefit(self.current_generation.population[i])}\n')
 
-    def stop_condition_met(self, gen: Generation, bag: Bag) -> bool:
-        if gen.gen_count > 1000:
-            # if gen.cont_same_fitness > 5:
-            #     print(f'ENTREEEEEEEEEEEEEE y gane en la generación: {gen.gen_count}')
-            #     return True
-            # else:
-            for i in range(len(gen.population)):
-                if bag.calculate_weight(gen.population[i]) <= bag.max_weight:
-                    print('EXITO')
-                    print(f'gen: {gen.gen_count}')
-                    print(f'total weight: {bag.calculate_weight(gen.population[i])}')
-                    return True
-        return False
