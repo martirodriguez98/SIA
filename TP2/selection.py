@@ -137,7 +137,7 @@ def prob_tournament_selector(generation: Generation, bag: Bag, size: int, param:
 def truncate_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     if param['k'] >= math.floor(size / 2):
         raise ValueError(f'Error in Truncate Selection Method.')
-    new_pop = sorted(generation.population.copy(), key=lambda i: bag.calculate_total_fitness(i))
+    new_pop = sorted(generation.population, key=lambda i: bag.calculate_total_fitness(i))
     new_pop = new_pop[param['k']:]
     return random.sample(new_pop, size)
 

@@ -3,6 +3,7 @@ from typing import List, Tuple
 
 from bag import Bag
 from data_loader import Item, load_data
+from plot import plot
 from resolver import Resolver
 from config_loader import Config
 
@@ -13,6 +14,7 @@ def main(config_file: str):
     bag: Bag = Bag(data_loaded[0], data_loaded[1], data_loaded[2])
     resolver: Resolver = Resolver(config, bag)
     resolver.bag_packer()
+    plot(resolver.get_plot(), "Elite")
 
 
 if __name__ == '__main__':
