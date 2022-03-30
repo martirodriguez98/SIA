@@ -1,4 +1,7 @@
 import random
+
+from numpy import average
+
 from bag import Bag
 from config_loader import Config
 from generation import Generation
@@ -15,6 +18,7 @@ class Resolver:
         self.selector: Selector = get_selector(config.selector)
         self.cross_method: Crossover = get_crossover(config.crossover)
         self.mutation_prob: float = config.mutation_prob
+        self.plot = {"min_fitness": [], "max_fitness": [], "avg_fitness": []}
 
     def bag_packer(self):
         while not self.stop_condition_met(self.current_generation, self.bag):
@@ -45,10 +49,21 @@ class Resolver:
             cur_gen_list = []
             for i in new_gen:
                 cur_gen_list.append(list(i))
+            print(f'SIZE DE LA LISTA: {len(self.current_generation.population)}')
+            min_fitness: float = 10000000000
+            avg: float = 0
+            for i in self.current_generation.population:
+                aux = self.bag.calculate_total_fitness(i)
+                if aux < min_fitness:
+                    min_fitness = aux
+                print(f'min_fitness: {min_fitness}')
 
-            for i in cur_gen_list:
-                print(self.bag.calculate_total_fitness(i))
+            self.plot["avg_fitness"].append(
+                average([self.bag.calculate_total_fitness(i) for i in self.current_generation.population]))
+            self.plot["min_fitness"].append(min_fitness)
+            self.plot["max_fitness"].append(best_fit)
             print("----------")
+
             gen_aux = Generation(cur_gen_list, self.current_generation.gen_count)
             aux = self.selector(gen_aux, self.bag, self.population_size)
             self.current_generation.population.clear()
@@ -60,6 +75,9 @@ class Resolver:
         for i in range(len(self.current_generation.population)):
             print(f'total weight: {self.bag.calculate_weight(self.current_generation.population[i])}\n'
                   f'total benefit: {self.bag.calculate_benefit(self.current_generation.population[i])}\n')
+
+    def get_plot(self):
+        return self.plot
 
     def stop_condition_met(self, gen: Generation, bag: Bag) -> bool:
         if gen.gen_count > 1000:
