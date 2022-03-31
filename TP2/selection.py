@@ -49,7 +49,6 @@ def get_individual_probs(population: Population, bag: Bag) -> Collection[float]:
 def elite_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     return sorted(generation.population, key=lambda i: bag.calculate_total_fitness(i), reverse=True)[0:size]
 
-
 def roulette_random_number(population: Population, bag: Bag, size: int) -> Population:
     result = np.random.choice(len(population), size, p=get_individual_probs(population, bag))
     new_pop: Population = []
@@ -61,15 +60,33 @@ def roulette_random_number(population: Population, bag: Bag, size: int) -> Popul
 def roulette_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     return roulette_random_number(generation.population, bag, size)
 
+def get_indexes(population: Population, sorted_pop: Population) -> list:
+    indexes = []
+    for ind in population:
+        index = 0
+        for s in sorted_pop:
+            if tuple(ind) == tuple(s):
+                indexes.append(index)
+                sorted_pop[index] = []
+                break
+            index+=1
+    return indexes
+
 
 def rank_selector(generation: Generation, bag: Bag, size: int, param: Param) -> Population:
     sorted_pop = sorted(generation.population, key=lambda ind: bag.calculate_total_fitness(ind), reverse=True)
+    indexes = get_indexes(generation.population, sorted_pop)
     weights = []
     pop_size = len(generation.population)
+    total_weight = 0
     for i in range(pop_size):
-        weights.append((pop_size - (i + 1)) / pop_size)
-    return random.choices(population=sorted_pop, weights=weights, k=size)
+        weights.append((pop_size - (indexes[i] + 1)) / pop_size)
+        total_weight += weights[i]
 
+    for i in range(pop_size):
+        weights[i] = weights[i] / total_weight
+
+    return random.choices(population=generation.population, weights=weights, k=size)
 
 def get_prob(prob_list: np.ndarray) -> Collection[float]:
     return np.cumsum(prob_list / prob_list.sum())
@@ -83,8 +100,7 @@ def calculate_boltzmann(generation: Generation, bag: Bag, k: float, t0: float, t
     new_fitness = []
     total_fitness = 0
     for ind in generation.population:
-        aux = bag.calculate_total_fitness(
-            ind) / 100  # dividimos por 100 porque hay fitness que son muy grandes y la exponencial no da
+        aux = bag.calculate_total_fitness(ind) / 100  # dividimos por 100 porque hay fitness que son muy grandes y la exponencial no da
         f = math.exp(aux / t)
         new_fitness.append(f)
         total_fitness += f

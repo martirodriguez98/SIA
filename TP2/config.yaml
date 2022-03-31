@@ -2,7 +2,9 @@ items_file: Mochila100Elementos.txt
 population_size: 100
 selector:
   method:
-    name: elite
+    name: prob_tournament
+    params:
+      tournament_probability: 0.7
 crossover:
   method:
     name: multiple_point
@@ -10,10 +12,11 @@ crossover:
       points_q: 3
 mutation_prob: 0.005
 stop_condition:
-  percentage: 50
+  percentage: 30
   gen_count_percentage: 10
-  gen_count: 1030
-  fitness_gen_count: 500
+  gen_count: 500
+  fitness_gen_count: 20
+  time: 121
 
 
 

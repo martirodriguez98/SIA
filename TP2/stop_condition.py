@@ -32,8 +32,9 @@ def get_stop_condition(params: Param) -> StopCondition:
         stop_condition.time = params['time']
     except:
         pass
-    if isinstance(stop_condition.time,int) == False or stop_condition.time < 20:
-        raise ValueError(f'Invalid end condition. Time must be a positive integer greater than 20')
+    if stop_condition.time != -1:
+        if isinstance(stop_condition.time,int) == False or stop_condition.time < 120:
+            raise ValueError(f'Invalid end condition. Time must be a positive integer greater than 120')
 
     try:
         stop_condition.gen_count = params['gen_count']
@@ -65,20 +66,23 @@ def get_stop_condition(params: Param) -> StopCondition:
     return stop_condition
 
 def stop_condition_met(stop_condition: StopCondition, gen: Generation, bag: Bag) -> bool:
-        if gen.gen_count > stop_condition.gen_count:
-            if time.perf_counter() > stop_condition.time:
+    if gen.gen_count > stop_condition.gen_count:
+        if time.perf_counter() > stop_condition.time:
+            if valid_solution(gen,bag):
+                print('Time is over. A solution was found.')
+            else:
                 print('Time is over. A solution could not be found.')
-                return True
+            return True
 
-            if unchanged_generations(stop_condition,gen,bag):
-                print(f'{stop_condition.percentage}% of the population has remain the same for over {stop_condition.unchanged_gens} generations.')
-                return True
+        if unchanged_generations(stop_condition,gen,bag):
+            print(f'{stop_condition.percentage}% of the population has remain the same for over {stop_condition.unchanged_gens} generations.')
+            return True
 
-            if fitness_gen_count(stop_condition,gen,bag):
-                print(f'The best fitness has been the same over {stop_condition.fitness_gen_count} generations')
-                return True
+        if fitness_gen_count(stop_condition,gen,bag):
+            print(f'The best fitness has been the same over {stop_condition.fitness_gen_count} generations')
+            return True
 
-        return False
+    return False
 
 def valid_solution(gen: Generation, bag: Bag) -> bool:
     best_ind,best_fit,weight = bag.best_individual(gen.population)

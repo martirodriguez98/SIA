@@ -52,20 +52,17 @@ class Resolver:
             cur_gen_list = []
             for i in new_gen:
                 cur_gen_list.append(list(i))
-            print(f'SIZE DE LA LISTA: {len(self.current_generation.population)}')
             min_fitness: float = 10000000000
             avg: float = 0
             for i in self.current_generation.population:
                 aux = self.bag.calculate_total_fitness(i)
                 if aux < min_fitness:
                     min_fitness = aux
-                print(f'min_fitness: {min_fitness}')
 
             self.plot["avg_fitness"].append(
                 average([self.bag.calculate_total_fitness(i) for i in self.current_generation.population]))
             self.plot["min_fitness"].append(min_fitness)
             self.plot["max_fitness"].append(best_fit)
-            print("----------")
 
             gen_aux = Generation(cur_gen_list, self.current_generation.gen_count)
             aux = self.selector(gen_aux, self.bag, self.population_size)
