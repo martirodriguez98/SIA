@@ -14,7 +14,7 @@ def main(config_file: str):
     bag: Bag = Bag(data_loaded[0], data_loaded[1], data_loaded[2])
     resolver: Resolver = Resolver(config, bag)
     resolver.bag_packer()
-    plot(resolver.get_plot(), "Elite")
+    plot(resolver.get_plot(), "Truncate")
 
 
 if __name__ == '__main__':

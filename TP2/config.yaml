@@ -1,15 +1,27 @@
 items_file: Mochila100Elementos.txt
+<<<<<<< Updated upstream
 population_size: 100
+=======
+population_size: 10
+>>>>>>> Stashed changes
 selector:
   method:
     name: prob_tournament
     params:
+<<<<<<< Updated upstream
       tournament_probability: 0.7
+=======
+      k: 4
+>>>>>>> Stashed changes
 crossover:
   method:
     name: multiple_point
     params:
+<<<<<<< Updated upstream
       points_q: 3
+=======
+      points_q: 4
+>>>>>>> Stashed changes
 mutation_prob: 0.005
 stop_condition:
   percentage: 30
