@@ -12,7 +12,7 @@ crossover:
   method:
     name: multiple_point
     params:
-      points_q: 3
+      points_q: 4
 mutation_prob: 0.005
 stop_condition:
   percentage: 30

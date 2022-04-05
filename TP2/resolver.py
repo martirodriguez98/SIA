@@ -48,12 +48,10 @@ class Resolver:
                 if len(new_gen) < 2 * self.population_size:
                     if tuple(second_child) not in new_gen:
                         new_gen.add(tuple(second_child))
-
             cur_gen_list = []
             for i in new_gen:
                 cur_gen_list.append(list(i))
             min_fitness: float = 10000000000
-            avg: float = 0
             for i in self.current_generation.population:
                 aux = self.bag.calculate_total_fitness(i)
                 if aux < min_fitness:
