@@ -1,10 +1,13 @@
 items_file: Mochila100Elementos.txt
-population_size: 100
+population_size: 10
 selector:
   method:
-    name: prob_tournament
+    name: boltzmann
     params:
-      tournament_probability: 0.7
+      initial_temp: 40
+      final_temp: 5
+      k: 0.05
+
 crossover:
   method:
     name: multiple_point
@@ -14,7 +17,7 @@ mutation_prob: 0.005
 stop_condition:
   percentage: 30
   gen_count_percentage: 10
-  gen_count: 500
+  gen_count: 5000
   fitness_gen_count: 20
   time: 121
 

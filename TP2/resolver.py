@@ -73,7 +73,6 @@ class Resolver:
             update_changed_population(self.stop_condition, self.current_generation, self.bag)
 
         print(f'generation count: {self.current_generation.gen_count}\n')
-        print(f'size pop: {len(self.current_generation.population)}')
         for i in range(len(self.current_generation.population)):
             print(f'total weight: {self.bag.calculate_weight(self.current_generation.population[i])}\n'
                   f'total benefit: {self.bag.calculate_benefit(self.current_generation.population[i])}\n')
