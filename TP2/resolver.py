@@ -74,7 +74,7 @@ class Resolver:
         for i in range(len(self.current_generation.population)):
             print(f'total weight: {self.bag.calculate_weight(self.current_generation.population[i])}\n'
                   f'total benefit: {self.bag.calculate_benefit(self.current_generation.population[i])}\n'
-                  f'fitness: {self.bag.calculate_total_fitness(self.current_generation.population[i])}')
+                  f'fitness: {self.bag.calculate_total_fitness(self.current_generation.population[i])}\n')
 
     def get_plot(self):
         return self.plot
