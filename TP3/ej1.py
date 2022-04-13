@@ -11,7 +11,7 @@ def ej1(config_file: str):
     config: Config = Config(config_file)
     training_set: Param = config.training_set
 
-    #TODO agregar en el readme que el default es el set de and
+    # TODO agregar en el readme que el default es el set de and
     if not training_set or training_set['x'] is None:
         training_set['x'] = 'training_sets/x/ej1_and.tsv'
     if not training_set or training_set['y'] is None:
@@ -21,6 +21,7 @@ def ej1(config_file: str):
     y: np.ndarray = get_set(training_set['y'], training_set['y_line_count'])
 
     neural_network: NeuralNetwork = get_neural_network(config.network, len(x[0]))()
+    neural_network.train(x, y)
 
 
 if __name__ == '__main__':
