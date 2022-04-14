@@ -23,21 +23,22 @@ class NeuralNetwork(ABC):
     def train(self, x: np.ndarray, y: np.ndarray):
         p: int = len(y)
         i: int = 0
-        w = np.zeros(self.config_neural.x_count + 1)
+        w = np.zeros(self.config_neural.x_count)
         error: int = 1
         error_min = p * 2
         while error > 0 and i < COTA:
-            i_x = random.randint(1, len(y))
-            h = x[i_x].w
+            i_x = random.randint(1, len(y)-1)
+            h = np.dot(x[i_x],w)
             o = np.sign(h)
-            delta_w = n * (y[i_x] - o).x[i_x]
+            delta_w = np.dot((n * (y[i_x] - o))[0],x[i_x])
+            # delta_w = n * (y[i_x] - o).x[i_x]
             w = w + delta_w
             error = self.calcular_error(x, y, w, p)
             if error < error_min:
                 error_min = error
                 w_min = w
             i = i + 1
-
+        
     def calcular_error(self, x: np.ndarray, y: np.ndarray, w: np.array, p: int):
         return 1
 
@@ -48,8 +49,8 @@ class SingleNeuralNetwork(NeuralNetwork, ABC):
         config.single = "en single"
         super().__init__(config)
 
-    def train(self):
-        super().train()
+    def train(self,  x: np.ndarray, y: np.ndarray):
+        super().train(x, y)
 
 
 class SimpleNeuralNetwork(SingleNeuralNetwork):
