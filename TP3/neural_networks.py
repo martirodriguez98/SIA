@@ -1,6 +1,6 @@
 import random
 from abc import ABC
-
+from plot import plot
 import numpy as np
 
 # chequear si la tenemos que definir nosotras o la pasan como parametro
@@ -24,6 +24,8 @@ class NeuralNetwork(ABC):
         p: int = len(y)
         i: int = 0
         w = np.zeros(self.config_neural.x_count)
+        all_w: list = []
+        all_w.append(w)
         error: int = 1
         error_min = p * 2
         while error > 0 and i < COTA:
@@ -33,11 +35,13 @@ class NeuralNetwork(ABC):
             delta_w = np.dot((n * (y[i_x] - o))[0],x[i_x])
             # delta_w = n * (y[i_x] - o).x[i_x]
             w = w + delta_w
+            all_w.append(w)
             error = self.calcular_error(x, y, w, p)
             if error < error_min:
                 error_min = error
                 w_min = w
             i = i + 1
+        plot(all_w)
         
     def calcular_error(self, x: np.ndarray, y: np.ndarray, w: np.array, p: int):
         return 1
