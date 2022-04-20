@@ -33,7 +33,7 @@ class NeuralNetwork(ABC):
         while error > 0 and i < COTA:
             print(x)
             print(w)
-            i_x = random.randint(1, p - 1)
+            i_x = random.randint(0, p - 1)
             h = np.dot(x[i_x], w)
             o = np.copysign(1, h)
             delta_w = n * (y[i_x] - o) * x[i_x]
@@ -45,8 +45,8 @@ class NeuralNetwork(ABC):
                 w_min = w
             i = i + 1
         print(w_min)
-        self.plot["x"].append(np.arange(-1, 2))
-        self.plot["y"].append((-w_min[1] / w_min[2]) * np.arange(-1, 2) - w_min[0] / w_min[2])
+        self.plot["x"].append(np.arange(-2, 2))
+        self.plot["y"].append((-w_min[1] / w_min[2]) * np.arange(-2, 2) - w_min[0] / w_min[2])
         plot(self.plot)
 
     def calculate_error(self, x: np.ndarray, y: np.ndarray, w: np.array, p: int):
