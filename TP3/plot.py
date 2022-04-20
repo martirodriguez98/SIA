@@ -13,10 +13,7 @@ def plot(plot_info: dict):
 
     plt.axhline(0, color="black")
     plt.axvline(0, color="black")
-    a = np.array(plot_info["x"])
-    b = np.array(plot_info["y"])
-    print(a[0])
-    print(b[0])
-    plt.plot(a[0], b[0])
+   
+    plt.plot(plot_info["x"][0], plot_info["y"][0])
 
     plt.show()
