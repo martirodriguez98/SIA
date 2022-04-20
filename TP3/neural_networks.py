@@ -1,11 +1,11 @@
 import random
 from abc import ABC
-from plot import plot_2d, plot_3d
+from plot import plot_2d, plot_errors
 import numpy as np
 
 # chequear si la tenemos que definir nosotras o la pasan como parametro
-COTA = 10
-n = 0.01
+COTA = 100
+n = 0.001
 
 
 class NeuralNetworkConfig:
@@ -19,13 +19,11 @@ class NeuralNetworkConfig:
 class NeuralNetwork(ABC):
     def __init__(self, config_neural: NeuralNetworkConfig):
         self.config_neural: NeuralNetworkConfig = config_neural
-        self.plot = {"x": [], "y": []}
+        self.plot = {"x": [], "y": [], "errors": []}
 
     def train(self, x: np.ndarray, y: np.ndarray):
         pass
 
-    def calculate_error(self, x: np.ndarray, y: np.ndarray, w: np.array, p: int):
-        pass
 
 
 class SimpleNeuralNetwork(NeuralNetwork):
@@ -35,7 +33,7 @@ class SimpleNeuralNetwork(NeuralNetwork):
         i: int = 0
         w = np.zeros(self.config_neural.x_count)
         w_min = w
-        error: int = 1
+        error: float = 1
         error_min = p * 2
         while error > 0 and i < COTA:
             i_x = random.randint(0, p - 1)
@@ -44,6 +42,7 @@ class SimpleNeuralNetwork(NeuralNetwork):
             delta_w = n * (y[i_x] - o) * x[i_x]
             w = w + delta_w
             error = self.calculate_error(x, y, w, p)
+            print(error)
             if error < error_min:
                 error_min = error
                 w_min = w
@@ -66,22 +65,22 @@ class LinearNeuralNetwork(NeuralNetwork):
         i: int = 0
         w = np.zeros(self.config_neural.x_count)
         w_min = w
-        error: int = 1
+        error: float = 1
         error_min = p * 2
+
         while error > 0 and i < COTA:
             i_x = random.randint(0, p - 1)
             h = np.dot(x[i_x], w)
             o = self.activation(w, x)
             delta_w = n * (y[i_x] - o) * x[i_x]
             w = w + delta_w
-            error = self.calculate_error(x, y, w, p)
+            error = self.calculate_error(o, y, p)
+            self.plot["errors"].append(error)
             if error < error_min:
                 error_min = error
                 w_min = w
             i = i + 1
-        self.plot["x"].append(np.arange(-2, 4))
-        self.plot["y"].append((-w_min[1] / w_min[2]) * np.arange(-2, 4) - w_min[0] / w_min[2])
-        plot_3d(self.plot, x, y)
+        plot_errors(self.plot, x, y)
 
     def activation(self, w: np.array, x: np.ndarray):
         o: float = 0
@@ -89,11 +88,11 @@ class LinearNeuralNetwork(NeuralNetwork):
             o += sum(w[i] * x[i])
         return o
 
-    def calculate_error(self, x: np.ndarray, y: np.ndarray, w: np.array, p: int):
-        o = []
+    def calculate_error(self, o: float, y: np.ndarray, p: int):
+        aux = []
         for i in range(p):
-            o.append(0.5 * pow(abs(y[i] - np.copysign(1, np.dot(x[i], w))), 2))
-        return sum(o)
+            aux.append(0.5 * pow(abs(y[i] - o), 2))
+        return sum(aux)
 
 # class NonLinearNeuralNetwork(SingleNeuralNetwork):
 #     #extiende a SingleNeuralN
