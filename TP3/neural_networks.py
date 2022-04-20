@@ -45,8 +45,8 @@ class NeuralNetwork(ABC):
                 w_min = w
             i = i + 1
         print(w_min)
-        self.plot["x"].append(np.arange(-2, 2))
-        self.plot["y"].append((-w_min[1] / w_min[2]) * np.arange(-2, 2) - w_min[0] / w_min[2])
+        self.plot["x"].append(np.arange(-2, 4))
+        self.plot["y"].append((-w_min[1] / w_min[2]) * np.arange(-2, 4) - w_min[0] / w_min[2])
         plot(self.plot)
 
     def calculate_error(self, x: np.ndarray, y: np.ndarray, w: np.array, p: int):
