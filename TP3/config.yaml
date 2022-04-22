@@ -4,6 +4,4 @@ training_set:
   y: training_sets/y/ej2_out.tsv
   y_line_count: 1
 network:
-  type: linear
-  network_params:
-    test: ok
+  type: nonlinear

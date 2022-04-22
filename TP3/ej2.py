@@ -17,7 +17,7 @@ def ej2(config_file: str):
     if not training_set or training_set['y'] is None:
         training_set['y'] = 'training_sets/y/ej2_out.tsv'
 
-    x: np.ndarray = get_set(training_set['x'], training_set['x_line_count'])
+    x: np.ndarray = get_set(training_set['x'], training_set['x_line_count'], True)
     # agregamos un espacio para el umbral seteado en 1
     new_x: np.ndarray = np.ones((len(x), len(x[0]) + 1))
     for i in range(len(x)):
@@ -25,7 +25,7 @@ def ej2(config_file: str):
             new_x[i][j + 1] = x[i][j]
     x = new_x
 
-    y: np.ndarray = get_set(training_set['y'], training_set['y_line_count'])
+    y: np.ndarray = get_set(training_set['y'], training_set['y_line_count'], True)
     
     neural_network: NeuralNetwork = get_neural_network(config.network, len(x[0]))()
     neural_network.train(x, y)
