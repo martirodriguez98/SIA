@@ -8,6 +8,7 @@ from typing import Callable
 # chequear si la tenemos que definir nosotras o la pasan como parametro
 COTA = 100
 n = 0.001
+MIN_ERROR = 0.01
 
 class NeuralNetworkConfig:
     def __init__(self):
@@ -21,8 +22,6 @@ class NeuralNetwork(ABC):
 
     def train(self, x: np.ndarray, y: np.ndarray):
         pass
-
-
 
 class SimpleNeuralNetwork(NeuralNetwork):
 
@@ -54,7 +53,6 @@ class SimpleNeuralNetwork(NeuralNetwork):
         for i in range(p):
             o.append(abs(y[i] - np.copysign(1, np.dot(x[i], w))))
         return sum(o)
-
 
 class LinearNeuralNetwork(NeuralNetwork):
 
@@ -139,6 +137,14 @@ def tanh(x: float, b: float) -> float:
 def tanh_der(x: float, b: float) -> float:
     return b * (1 - tanh(x, b) ** 2)
 
+class MultilayerNeuralNetwork(NeuralNetwork):
+    def train(self, x: np.ndarray, y: np.ndarray):
+        p: int = len(y)
+        #conjunto de pesos en valores pequeñoas al azar
+        w: np.ndarray = np.ndarray(len(x))
+        for i in range(len(x)):
+            w[i] = random.random()
+        error: float = 1
 
-# class MultilayerNeuralNetwork(NeuralNetwork):
-#     #clase (no abs) para el multicapa (ej 3)
+        while error > MIN_ERROR:
+            i_x = random.randint(0, p - 1)

@@ -6,7 +6,7 @@ from schema import Schema, And, Or, Optional
 
 from config import Param, Config
 from neural_networks import NeuralNetwork, NeuralNetworkConfig, SimpleNeuralNetwork, LinearNeuralNetwork, \
-    NonLinearNeuralNetwork
+    NonLinearNeuralNetwork, MultilayerNeuralNetwork
 
 _NeuralNetworkTypeCall = Callable[[NeuralNetworkConfig], Callable[[], NeuralNetwork]]
 SigmoidFunction = Callable[[float], float]
@@ -65,12 +65,13 @@ def _get_non_linear_perceptron(neural_network_config: NeuralNetworkConfig) -> Ca
     # params = _validate_non_linear_params(params)
     return lambda: NonLinearNeuralNetwork(neural_network_config)
 
-
+def _get_multilayer_perceptron(neural_network_config: NeuralNetworkConfig) -> Callable[[], NeuralNetwork]:
+    return lambda: MultilayerNeuralNetwork(neural_network_config)
 
 _neural_networks_types: Dict[str, _NeuralNetworkTypeCall] = {
     'simple': _get_simple_perceptron,
     'linear': _get_linear_perceptron,
-    'nonlinear': _get_non_linear_perceptron
-    # todo complete others
+    'nonlinear': _get_non_linear_perceptron,
+    'multilayer': _get_multilayer_perceptron
 }
 
