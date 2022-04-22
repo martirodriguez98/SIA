@@ -12,6 +12,7 @@ _NeuralNetworkTypeCall = Callable[[NeuralNetworkConfig], Callable[[], NeuralNetw
 SigmoidFunction = Callable[[float], float]
 SigmoidFunctionDer = Callable[[float], float]
 
+
 def get_set(file: str, line_count: int, normalize: bool) -> np.ndarray:
     set: np.ndarray = pd.read_csv(file, delim_whitespace=True, header=None).values
     if normalize:
@@ -20,9 +21,9 @@ def get_set(file: str, line_count: int, normalize: bool) -> np.ndarray:
         data_shape = set.shape
         data_rows = data_shape[0]
         data_cols = data_shape[1]
-        t=np.empty((data_rows,data_cols))
+        t = np.empty((data_rows, data_cols))
         for i in range(data_cols):
-            t[:,i]=(set[:,i]-mincols[i])/(maxcols[i]-mincols[i])
+            t[:, i] = (set[:, i] - mincols[i]) / (maxcols[i] - mincols[i])
         return t
     return set
 
@@ -42,6 +43,7 @@ def build_network_config(network_params: Param, x_count: int) -> NeuralNetworkCo
     # todo complete with params
     return config
 
+
 def get_neural_network(neural_network_params: Param, x_count: int) -> Callable[[], NeuralNetwork]:
     neural_network_params = validate_params(neural_network_params)
     network_config: NeuralNetworkConfig = build_network_config(neural_network_params, x_count)
@@ -56,6 +58,7 @@ def _get_simple_perceptron(config: NeuralNetworkConfig) -> Callable[[], NeuralNe
 def _get_linear_perceptron(neural_network_config: NeuralNetworkConfig) -> Callable[[], NeuralNetwork]:
     return lambda: LinearNeuralNetwork(neural_network_config)
 
+
 # def _validate_non_linear_params(params: Param) -> Param:
 #     return Config.validate_param(params, Schema({
 #
@@ -65,8 +68,10 @@ def _get_non_linear_perceptron(neural_network_config: NeuralNetworkConfig) -> Ca
     # params = _validate_non_linear_params(params)
     return lambda: NonLinearNeuralNetwork(neural_network_config)
 
+
 def _get_multilayer_perceptron(neural_network_config: NeuralNetworkConfig) -> Callable[[], NeuralNetwork]:
     return lambda: MultilayerNeuralNetwork(neural_network_config)
+
 
 _neural_networks_types: Dict[str, _NeuralNetworkTypeCall] = {
     'simple': _get_simple_perceptron,
@@ -74,4 +79,3 @@ _neural_networks_types: Dict[str, _NeuralNetworkTypeCall] = {
     'nonlinear': _get_non_linear_perceptron,
     'multilayer': _get_multilayer_perceptron
 }
-

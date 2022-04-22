@@ -10,6 +10,7 @@ COTA = 100
 n = 0.001
 MIN_ERROR = 0.01
 
+
 class NeuralNetworkConfig:
     def __init__(self):
         self.x_count: int = 0
@@ -22,6 +23,7 @@ class NeuralNetwork(ABC):
 
     def train(self, x: np.ndarray, y: np.ndarray):
         pass
+
 
 class SimpleNeuralNetwork(NeuralNetwork):
 
@@ -53,6 +55,7 @@ class SimpleNeuralNetwork(NeuralNetwork):
         for i in range(p):
             o.append(abs(y[i] - np.copysign(1, np.dot(x[i], w))))
         return sum(o)
+
 
 class LinearNeuralNetwork(NeuralNetwork):
 
@@ -90,6 +93,7 @@ class LinearNeuralNetwork(NeuralNetwork):
             aux.append(0.5 * pow(abs(y[i] - o), 2))
         return sum(aux)
 
+
 class NonLinearNeuralNetwork(NeuralNetwork):
     def train(self, x: np.ndarray, y: np.ndarray):
         b: float = 0.01
@@ -125,26 +129,59 @@ class NonLinearNeuralNetwork(NeuralNetwork):
             aux += 0.5 * pow(abs(y[i] - o), 2)
         return aux
 
-    def calculate_delta_w(self,x: np.ndarray, y: np.ndarray, p: int, i_x: int, h: float,b: float):
+    def calculate_delta_w(self, x: np.ndarray, y: np.ndarray, p: int, i_x: int, h: float, b: float):
         delta_w: float = 0
         for i in range(p):
             delta_w += (y[i_x] - tanh(h, b)) * tanh_der(h, b) * x[i_x]
         return n * delta_w
 
+
 def tanh(x: float, b: float) -> float:
     return np.tanh(b * x)
+
 
 def tanh_der(x: float, b: float) -> float:
     return b * (1 - tanh(x, b) ** 2)
 
+
+
 class MultilayerNeuralNetwork(NeuralNetwork):
     def train(self, x: np.ndarray, y: np.ndarray):
         p: int = len(y)
-        #conjunto de pesos en valores pequeñoas al azar
-        w: np.ndarray = np.ndarray(len(x))
+        # conjunto de pesos en valores pequeñoas al azar
+        w: np.ndarray = np.empty(len(x))
         for i in range(len(x)):
             w[i] = random.random()
         error: float = 1
+        # TODO parametrizar
+        layers: list = [3, 2]
+        v_layer: np.ndarray = np.empty(len(layers))
+        print(v_layer)
+        for i in range(len(v_layer)):
+            v_layer[i] = np.empty(layers[i])
 
         while error > MIN_ERROR:
             i_x = random.randint(0, p - 1)
+            v = self.create_v0(x[i_x])
+            for i in layers:
+                v = self.calculate_v(v, w)
+
+
+    def calculate_v(self, v, w):
+        h: float = self.calculate_h(w, v)
+        v_new: np.ndarray = np.empty(len(v))
+        for i in range(len(v)):
+            v[i] = tanh(h, 0.05)
+        return v_new
+
+    def create_v0(self, x_i_x):
+        v0: np.ndarray = np.empty(len(x_i_x))
+        for i in range(len(x_i_x)):
+            v0[i] = x_i_x[i]
+        return v0
+
+    def calculate_h(self, w, v):
+        h: float = 0
+        for j in range(len(v)):
+            h += v[j]*w[j]
+        return h
