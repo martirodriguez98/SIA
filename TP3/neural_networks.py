@@ -144,50 +144,110 @@ def tanh_der(x: float, b: float) -> float:
     return b * (1 - tanh(x, b) ** 2)
 
 
+class Perceptron:
+    def __init__(self, w, v, d, h):
+        self.w = w
+        self.v = v
+        self.d = d
+        self.h = h
+
+    def __repr__(self):
+        return f'w: {self.w}\tv: {self.v}\td: {self.d}\th: {self.h}\n'
 
 class MultilayerNeuralNetwork(NeuralNetwork):
     def train(self, x: np.ndarray, y: np.ndarray):
+        # b: float = 0.05
+        # p: int = len(y)
+        # layers: list = [3, 2, 4]
+        # conjunto de pesos en valores pequeños al azar
+
+        # error: float = 1
+        # # TODO parametrizar
+        # layers: list = [3, 2, 4]
+        # v_layer = [0] * len(layers)
+        # d: list = [0] * len(layers)
+        # w: list = [0] * len(layers)
+        # h: list = [0] * len(layers)
+        # for i in range(len(v_layer)):
+        #     v_layer[i] = [0] * (layers[i])
+        #     w[i] = [0] * (layers[i])
+        #     h[i] = [0] * (layers[i])
+        #     d[i] = [0] * (layers[i])
+        #     for j in range(layers[i]):
+        #         w[i][j] = random.random()
+        # while error > MIN_ERROR:
+        #     i_x = random.randint(0, p - 1)
+        #     v_layer[0] = self.create_v0(x[i_x])
+        #     #propagamos entrada hasta a capa de salida
+        #     for i in range(len(layers)-1):
+        #         i+=1
+        #         for j in range(layers[i]):
+        #             v_layer[i][j] = self.calculate_v(v_layer[i-1], w[i][j], b)
+        #
+        #     # #delta para capa de salida
+        #     last_pos = len(v_layer) - 1
+        #     for i in range(len(h[last_pos])):
+        #         h[last_pos][i] = self.calculate_h(w[last_pos][i],v_layer[last_pos])
+        #         d[last_pos][i] = tanh_der(h[last_pos][i], b) * (y[last_pos] - v_layer[last_pos])
+        #     # #retropropagamos delta
+        #
+        #     for i in range(len(v_layer)): #for para layers
+        #         sum = 0
+        #         for j in range(len(v_layer[i])-1):
+        #             h[len(v_layer)-1-i][j] = self.calculate_h(w[len(v_layer)-1-i][j], v_layer[len(v_layer)-1-i])
+        #             sum += w[len(v_layer)-1-i][j] * d[len(v_layer)-1-i][j]
+        #         for j in range(len(v_layer[i])-1):
+        #             d[len(v_layer)-1-i][j] = tanh_der(h[len(v_layer)-1-i][j],b) * sum
+        #
+        #     #actualizamos pesos
+        #     for i in range(len(v_layer)-1):
+        #         i+=1
+        #         for j in range(len(v_layer[i-1]) - 1):
+        #             delta_w = n * d[i][j] * v_layer[i-1][j]
+        #             w[i][j] = w[i][j] + delta_w
+        #
+        #     print(w)
         b: float = 0.05
         p: int = len(y)
-        # conjunto de pesos en valores pequeñoas al azar
-        w: np.ndarray = np.empty(len(x))
-        for i in range(len(x)):
-            w[i] = random.random()
-        error: float = 1
-        # TODO parametrizar
-        layers: list = [3, 2, 4]
-        v_layer: np.ndarray = [None] * len(layers)
-        d: np.ndarray = np.empty(len(layers))
-        for i in range(len(v_layer)):
-            v_layer[i] = [None] * (layers[i])
+        #todo acordarse que la primera capa tiene que ser del tamaño de la entrada
+        layers: list = [3, 4, 2]
+        error = 1
+        len_layers = len(layers)
+        perceptrons = [None] * len_layers
+
+        for i in range(len_layers):
+            perceptrons[i] = [None] * layers[i]
+            for j in range(layers[i]):
+                perceptrons[i][j] = Perceptron(None, None, None, None)
+                if i != len_layers-1: #si no es la ultima capa
+                    perceptrons[i][j].w = [0] * layers[i+1]
+                    for w in range(layers[i+1]):
+                        perceptrons[i][j].w[w] = random.random()
 
         while error > MIN_ERROR:
             i_x = random.randint(0, p - 1)
-            v = self.create_v0(x[i_x])
-            #propagamos entrada hasta a capa de salida
-            for i in layers:
-                v = self.calculate_v(v, w, b)
-            #delta para capa de salida
-            last_pos = len(v_layer) - 1
-            h = self.calculate_h(w,v)
-            d[last_pos] = tanh_der(h, b) * (y[last_pos] - v[last_pos])
-            #retropropagamos delta
-            for i in range(len(d)-1):
+            # aplicamos entrada a capa 0
+            for j in range(layers[0]):
+                perceptrons[0][j].v = x[i_x][j]
+
+            print(perceptrons)
+            # propagamos entrada hasta a capa de salida
+            for i in range(len_layers):
                 i+=1
-                h = self.calculate_h(w,v)
+                for j in range(layers[i]):
+                    perceptrons[i][j].v = self.calculate_v(perceptrons[i-1][j].v,perceptrons[i][j].w,b)
+
+            error = MIN_ERROR
 
 
 
 
     def calculate_v(self, v, w, b):
-        h: float = self.calculate_h(w, v)
-        v_new: np.ndarray = np.empty(len(v))
-        for i in range(len(v)):
-            v[i] = tanh(h, b)
-        return v_new
+        h = self.calculate_h(w, v)
+        return tanh(h, b)
 
     def create_v0(self, x_i_x):
-        v0: np.ndarray = np.empty(len(x_i_x))
+        v0 = [0] * len(x_i_x)
         for i in range(len(x_i_x)):
             v0[i] = x_i_x[i]
         return v0
@@ -195,5 +255,5 @@ class MultilayerNeuralNetwork(NeuralNetwork):
     def calculate_h(self, w, v):
         h: float = 0
         for j in range(len(v)):
-            h += v[j]*w[j]
+            h += v[j]*w
         return h
