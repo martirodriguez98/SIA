@@ -147,6 +147,7 @@ def tanh_der(x: float, b: float) -> float:
 
 class MultilayerNeuralNetwork(NeuralNetwork):
     def train(self, x: np.ndarray, y: np.ndarray):
+        b: float = 0.05
         p: int = len(y)
         # conjunto de pesos en valores pequeñoas al azar
         w: np.ndarray = np.empty(len(x))
@@ -154,24 +155,35 @@ class MultilayerNeuralNetwork(NeuralNetwork):
             w[i] = random.random()
         error: float = 1
         # TODO parametrizar
-        layers: list = [3, 2]
-        v_layer: np.ndarray = np.empty(len(layers))
-        print(v_layer)
+        layers: list = [3, 2, 4]
+        v_layer: np.ndarray = [None] * len(layers)
+        d: np.ndarray = np.empty(len(layers))
         for i in range(len(v_layer)):
-            v_layer[i] = np.empty(layers[i])
+            v_layer[i] = [None] * (layers[i])
 
         while error > MIN_ERROR:
             i_x = random.randint(0, p - 1)
             v = self.create_v0(x[i_x])
+            #propagamos entrada hasta a capa de salida
             for i in layers:
-                v = self.calculate_v(v, w)
+                v = self.calculate_v(v, w, b)
+            #delta para capa de salida
+            last_pos = len(v_layer) - 1
+            h = self.calculate_h(w,v)
+            d[last_pos] = tanh_der(h, b) * (y[last_pos] - v[last_pos])
+            #retropropagamos delta
+            for i in range(len(d)-1):
+                i+=1
+                h = self.calculate_h(w,v)
 
 
-    def calculate_v(self, v, w):
+
+
+    def calculate_v(self, v, w, b):
         h: float = self.calculate_h(w, v)
         v_new: np.ndarray = np.empty(len(v))
         for i in range(len(v)):
-            v[i] = tanh(h, 0.05)
+            v[i] = tanh(h, b)
         return v_new
 
     def create_v0(self, x_i_x):
