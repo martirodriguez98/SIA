@@ -8,7 +8,7 @@ import numpy as np
 from typing import Callable
 
 # chequear si la tenemos que definir nosotras o la pasan como parametro
-COTA = 100
+COTA = 500
 n = 0.001
 MIN_ERROR = 0.01
 
@@ -90,15 +90,15 @@ class LinearNeuralNetwork(NeuralNetwork):
         return o
 
     def calculate_error(self, o: float, y: np.ndarray, p: int):
-        aux = []
+        aux: float = 0
         for i in range(p):
-            aux.append(0.5 * pow(abs(y[i] - o), 2))
-        return sum(aux)
+            aux += (y[i] - o) ** 2
+        return 0.5 * aux
 
 
 class NonLinearNeuralNetwork(NeuralNetwork):
     def train(self, x: np.ndarray, y: np.ndarray):
-        b: float = 0.01
+        b: float = 0.005
         p: int = len(y)
         i: int = 0
         w = np.zeros(self.config_neural.x_count)
@@ -132,11 +132,7 @@ class NonLinearNeuralNetwork(NeuralNetwork):
         return 0.5 * aux
 
     def calculate_delta_w(self, x: np.ndarray, y: np.ndarray, p: int, i_x: int, h: float, b: float):
-        delta_w: float = 0
-        for i in range(p):
-            delta_w += (y[i_x] - tanh(h * b)) * tanh_der(h, b) * x[i_x]
-        return n * delta_w
-
+        return n * ((y[i_x] - tanh(h * b)) * tanh_der(h, b) * x[i_x])
 
 def tanh_der(x: float, b: float) -> float:
     return b * (1 - tanh(x * b) ** 2)
