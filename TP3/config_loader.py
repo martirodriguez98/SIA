@@ -16,15 +16,7 @@ SigmoidFunctionDer = Callable[[float], float]
 def get_set(file: str, line_count: int, normalize: bool) -> np.ndarray:
     set: np.ndarray = pd.read_csv(file, delim_whitespace=True, header=None).values
     if normalize:
-        maxcols = set.max(axis=0)
-        mincols = set.min(axis=0)
-        data_shape = set.shape
-        data_rows = data_shape[0]
-        data_cols = data_shape[1]
-        t = np.empty((data_rows, data_cols))
-        for i in range(data_cols):
-            t[:, i] = (set[:, i] - mincols[i]) / (maxcols[i] - mincols[i])
-        return t
+        set = 2 * (set - min(set)) / (max(set) - min(set)) - 1
     return set
 
 

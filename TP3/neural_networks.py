@@ -1,5 +1,7 @@
 import random
 from abc import ABC
+from math import tanh
+
 from plot import plot_2d, plot_errors
 from config import Param
 import numpy as np
@@ -41,7 +43,7 @@ class SimpleNeuralNetwork(NeuralNetwork):
             delta_w = n * (y[i_x] - o) * x[i_x]
             w = w + delta_w
             error = self.calculate_error(x, y, w, p)
-            print(error)
+            # print(error)
             if error < error_min:
                 error_min = error
                 w_min = w
@@ -109,7 +111,7 @@ class NonLinearNeuralNetwork(NeuralNetwork):
             h = self.excitation(w, x)
             delta_w = self.calculate_delta_w(x, y, p, i_x, h, b)
             w = w + delta_w
-            error = self.calculate_error(tanh(h, b), y, p)
+            error = self.calculate_error(tanh(h * b), y, p)
             self.plot["errors"].append(error)
             if error < error_min:
                 error_min = error
@@ -126,22 +128,18 @@ class NonLinearNeuralNetwork(NeuralNetwork):
     def calculate_error(self, o: float, y: np.ndarray, p: int):
         aux: float = 0
         for i in range(p):
-            aux += 0.5 * pow(abs(y[i] - o), 2)
-        return aux
+            aux += (y[i] - o) ** 2
+        return 0.5 * aux
 
     def calculate_delta_w(self, x: np.ndarray, y: np.ndarray, p: int, i_x: int, h: float, b: float):
         delta_w: float = 0
         for i in range(p):
-            delta_w += (y[i_x] - tanh(h, b)) * tanh_der(h, b) * x[i_x]
+            delta_w += (y[i_x] - tanh(h * b)) * tanh_der(h, b) * x[i_x]
         return n * delta_w
 
 
-def tanh(x: float, b: float) -> float:
-    return np.tanh(b * x)
-
-
 def tanh_der(x: float, b: float) -> float:
-    return b * (1 - tanh(x, b) ** 2)
+    return b * (1 - tanh(x * b) ** 2)
 
 
 class Perceptron:
@@ -239,12 +237,9 @@ class MultilayerNeuralNetwork(NeuralNetwork):
 
             error = MIN_ERROR
 
-
-
-
     def calculate_v(self, v, w, b):
         h = self.calculate_h(w, v)
-        return tanh(h, b)
+        return tanh(h * b)
 
     def create_v0(self, x_i_x):
         v0 = [0] * len(x_i_x)
