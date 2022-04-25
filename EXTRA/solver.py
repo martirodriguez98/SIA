@@ -20,11 +20,13 @@ def F(W, w, w0, x):
 def E(W, w, w0):
     sum = 0
     for u in range(1,3):
-        sum += (y[u] - F(W, w, x[u])) ** 2
+        sum += (y[u] - F(W, w, w0, x[u])) ** 2
     return sum
 
 def solver():
-    pass
+    # metodo del gradiente descendiente
+    # metodo de gradientes conjugados
+    #metodo ADAM
 
 
 # Press the green button in the gutter to run the script.
