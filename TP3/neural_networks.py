@@ -10,7 +10,7 @@ from typing import Callable
 # chequear si la tenemos que definir nosotras o la pasan como parametro
 COTA = 500
 n = 0.1
-MIN_ERROR = 0.01
+MIN_ERROR = 0.05
 
 
 class NeuralNetworkConfig:
@@ -24,6 +24,9 @@ class NeuralNetwork(ABC):
         self.plot = {"x": [], "y": [], "errors": []}
 
     def train(self, x: np.ndarray, y: np.ndarray):
+        pass
+
+    def get_output(self, input):
         pass
 
 
@@ -149,65 +152,81 @@ class Perceptron:
         return f'w: {self.w}\tv: {self.v}\td: {self.d}\th: {self.h}\n'
 
 class MultilayerNeuralNetwork(NeuralNetwork):
+    def __init__(self, config_neural: NeuralNetworkConfig):
+        self.perceptrons = None
+        self.layers = None
+        self.len_layers = 0
+        self.b = 0.05
+
     def train(self, x: np.ndarray, y: np.ndarray):
         b: float = 0.05
         p: int = len(y)
         #todo acordarse que la primera capa tiene que ser del tamaño de la entrada
-        layers: list = [len(x[0]), 4, len(y)]
+        self.layers: list = [len(x[0]), 4, len(y)]
         error = 1
-        len_layers = len(layers)
-        perceptrons = [None] * len_layers
+        self.len_layers = len(self.layers)
+        self.perceptrons = [None] * self.len_layers
 
-        for i in range(len_layers):
-            perceptrons[i] = [None] * layers[i]
-            for j in range(layers[i]):
-                perceptrons[i][j] = Perceptron(None, None, None, None)
-                if i != len_layers-1: #si no es la ultima capa
-                    perceptrons[i][j].w = [0] * layers[i+1]
-                    for w in range(layers[i+1]):
-                        perceptrons[i][j].w[w] = random.random()
+        for i in range(self.len_layers):
+            self.perceptrons[i] = [None] * self.layers[i]
+            for j in range(self.layers[i]):
+                self.perceptrons[i][j] = Perceptron(None, None, None, None)
+                if i != self.len_layers-1: #si no es la ultima capa
+                    self.perceptrons[i][j].w = [0] * self.layers[i+1]
+                    for w in range(self.layers[i+1]):
+                        self.perceptrons[i][j].w[w] = random.random()
 
         while error > MIN_ERROR:
             i_x = random.randint(0, p - 1)
             # 2. aplicamos entrada a capa 0
-            for j in range(layers[0]):
-                perceptrons[0][j].v = x[i_x][j]
+            for j in range(self.layers[0]):
+                self.perceptrons[0][j].v = x[i_x][j]
 
             # 3. propagamos entrada hasta a capa de salida
-            for i in range(len_layers):
-                if i == 0:
-                    i=1
-                for j in range(layers[i]):
-                    for k in range(layers[i-1]):
-                        perceptrons[i][j].v, perceptrons[i][j].h = self.calculate_v(perceptrons[i-1], j, b)
+            self.propagate()
+            # for i in range(len_layers):
+            #     if i == 0:
+            #         i=1
+            #     for j in range(self.layers[i]):
+            #         for k in range(self.layers[i-1]):
+            #             self.perceptrons[i][j].v, self.perceptrons[i][j].h = self.calculate_v(self.perceptrons[i-1], j, b)
 
             # 4. calcular d para la capa de salida
-            last_index = len_layers-1
-            for i in range(layers[last_index]):
-                aux = tanh_der(perceptrons[last_index][i].h, b) * (y[i] - perceptrons[last_index][i].v)[0]
-                perceptrons[last_index][i].d = aux
+            last_index = self.len_layers-1
+            for i in range(self.layers[last_index]):
+                aux = tanh_der(self.perceptrons[last_index][i].h, b) * (y[i] - self.perceptrons[last_index][i].v)[0]
+                self.perceptrons[last_index][i].d = aux
 
             # 5. Retropropagamos d
-            for j in range(len_layers-1-1): #es entre M y 2
-                index = len_layers - 1 - j - 1 #la ultima capa no la cuento
-                for i in range(layers[index]):
-                    perceptrons[index][i].d = self.calculate_delta(perceptrons[index][i].h, perceptrons[index][i].w, perceptrons[index+1], b)
+            for j in range(self.len_layers-1-1): #es entre M y 2
+                index = self.len_layers - 1 - j - 1 #la ultima capa no la cuento
+                for i in range(self.layers[index]):
+                    self.perceptrons[index][i].d = self.calculate_delta(self.perceptrons[index][i].h, self.perceptrons[index][i].w, self.perceptrons[index+1], b)
 
             # 6. Actualizamos pesos
-            for i in range(len_layers-1):
-                for j in range(layers[i]):
-                    for k in range(layers[i+1]):
-                        delta_w = n * perceptrons[i+1][k].d * perceptrons[i][j].v
-                        perceptrons[i][j].w[k] += delta_w
+            for i in range(self.len_layers-1):
+                for j in range(self.layers[i]):
+                    for k in range(self.layers[i+1]):
+                        delta_w = n * self.perceptrons[i+1][k].d * self.perceptrons[i][j].v
+                        self.perceptrons[i][j].w[k] += delta_w
 
             # 7. calcular error
-            error = self.calculate_error(perceptrons, layers, y, b)
-            print(error)
+            error = self.calculate_error(self.perceptrons, y, b)
+        print(self.perceptrons)
 
-    def calculate_error(self, perceptrons, layers, y, b):
+
+    def propagate(self):
+        for i in range(self.len_layers):
+            if i == 0:
+                i=1
+            for j in range(self.layers[i]):
+                for k in range(self.layers[i-1]):
+                    self.perceptrons[i][j].v, self.perceptrons[i][j].h = self.calculate_v(self.perceptrons[i-1], j, self.b)
+
+    def calculate_error(self, perceptrons, y, b):
         sum = 0
-        last_layer = len(layers)-1
-        for i in range(layers[last_layer]):
+        last_layer = len(self.layers)-1
+        for i in range(self.layers[last_layer]):
             o = tanh(perceptrons[last_layer][i].h * b)
             sum += (y[i] - o) ** 2
         return 0.5 * sum
@@ -236,3 +255,20 @@ class MultilayerNeuralNetwork(NeuralNetwork):
         for j in range(len(v)):
             h += v[j].v * w[j]
         return h
+
+    def get_output(self, input):
+        print('en get output')
+        aux_input: np.ndarray = np.ones((len(input), len(input[0]) + 1))
+        for i in range(len(input)):
+            for j in range(len(input[i])):
+                aux_input[i][j + 1] = input[i][j]
+        x = aux_input
+        output = []
+        for i in range(len(aux_input)):
+            for j in range(self.layers[0]):
+                self.perceptrons[0][j].v = aux_input[i][j]
+            self.propagate()
+            print(self.perceptrons[self.len_layers-1])
+            output.append([self.perceptrons[self.len_layers-1][i].v])
+        return output
+

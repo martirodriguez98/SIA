@@ -1,3 +1,5 @@
+import math
+import random
 import sys
 
 import numpy as np
@@ -30,6 +32,76 @@ def ej3(config_file: str):
     neural_network: NeuralNetwork = get_neural_network(config.network, len(x[0]))()
     neural_network.train(x, y)
 
+def ej3b(config_file: str):
+    config: Config = Config(config_file)
+    training_set: Param = config.training_set
+    if not training_set or training_set['x'] is None:
+        training_set['x'] = 'training_sets/x/ej3.tsv'
+    if not training_set or training_set['y'] is None:
+        training_set['y'] = 'training_sets/y/ej3.tsv'
+
+    training_size = 0.8 #todo parametrizar, numero entre 0 y 1 (mayor a 0)
+
+    x: np.ndarray = get_set(training_set['x'], training_set['x_line_count'], False)
+    new_x: np.ndarray = np.ones((len(x), len(x[0]) + 1))
+    for i in range(len(x)):
+        for j in range(len(x[i])):
+            new_x[i][j + 1] = x[i][j]
+    x = new_x
+
+    y: np.ndarray = get_set(training_set['y'], training_set['y_line_count'], False)
+
+    total_inputs = len(x)
+    limit = math.ceil(total_inputs * training_size)
+
+    training_set = []
+    testing_set = []
+    training_expected = []
+    testing_expected = []
+
+    # entrenamos #training_size pero los elegimos de manera random
+    for i in range(limit):
+        r = random.randint(0, len(x)-1)
+        training_set.append(x[r])
+        training_expected.append(y[r])
+        x = np.delete(x, r, axis=0)
+        y = np.delete(y, r, axis=0)
+
+    for i in range(len(x)):
+        testing_set.append(x[i])
+        testing_expected.append(y[i])
+
+    #los entrenamos en orden y despues no importa lo que testeamos, devuelve par, impar, par, etc
+    # training_set = x[:limit]
+    # testing_set = x[limit:]
+
+    # training_expected = y[:limit]
+    # testing_expected = y[limit:]
+
+    #entrenamos todos los pares y testeamos los impares
+    # training_set = []
+    # testing_set = []
+    # training_expected = []
+    # testing_expected = []
+    #
+    # for i in range(len(x)):
+    #     if i % 2 == 0:
+    #         training_set.append(x[i])
+    #         training_expected.append(y[i])
+    #     else:
+    #         testing_set.append(x[i])
+    #         testing_expected.append(y[i])
+
+    neural_network: NeuralNetwork = get_neural_network(config.network, len(x[0]))()
+    neural_network.train(training_set, training_expected)
+
+    print(f'training set:\n{training_set}')
+    print(f'testing set:\n{testing_set}')
+    print(f'testing expected output:\n{testing_expected}')
+    outputs = neural_network.get_output(testing_set if len(testing_set) > 0 else training_set)
+    print(outputs)
+
+
 if __name__ == '__main__':
     argv = sys.argv
 
@@ -38,8 +110,8 @@ if __name__ == '__main__':
         config_file = argv[1]
 
     try:
-        ej3(config_file)
-
+        # ej3(config_file)
+        ej3b(config_file)
     except ValueError as e:
         print(f'Error found in {config_file}\n{e}')
 
