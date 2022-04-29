@@ -9,7 +9,7 @@ from typing import Callable
 
 # chequear si la tenemos que definir nosotras o la pasan como parametro
 COTA = 500
-n = 0.1
+n = 0.3
 MIN_ERROR = 0.05
 
 
@@ -156,13 +156,13 @@ class MultilayerNeuralNetwork(NeuralNetwork):
         self.perceptrons = None
         self.layers = None
         self.len_layers = 0
-        self.b = 0.05
+        self.b = 0.9
+        super().__init__(config_neural)
 
     def train(self, x: np.ndarray, y: np.ndarray):
-        b: float = 0.05
         p: int = len(y)
         #todo acordarse que la primera capa tiene que ser del tamaño de la entrada
-        self.layers: list = [len(x[0]), 4, len(y)]
+        self.layers: list = [len(x[0]), 4, len(y[0])]
         error = 1
         self.len_layers = len(self.layers)
         self.perceptrons = [None] * self.len_layers
@@ -176,7 +176,8 @@ class MultilayerNeuralNetwork(NeuralNetwork):
                     for w in range(self.layers[i+1]):
                         self.perceptrons[i][j].w[w] = random.random()
 
-        while error > MIN_ERROR:
+        cota = 0
+        while error > MIN_ERROR and cota < COTA:
             i_x = random.randint(0, p - 1)
             # 2. aplicamos entrada a capa 0
             for j in range(self.layers[0]):
@@ -194,14 +195,14 @@ class MultilayerNeuralNetwork(NeuralNetwork):
             # 4. calcular d para la capa de salida
             last_index = self.len_layers-1
             for i in range(self.layers[last_index]):
-                aux = tanh_der(self.perceptrons[last_index][i].h, b) * (y[i] - self.perceptrons[last_index][i].v)[0]
+                aux = tanh_der(self.perceptrons[last_index][i].h, self.b) * (y[i_x][i] - self.perceptrons[last_index][i].v)
                 self.perceptrons[last_index][i].d = aux
 
             # 5. Retropropagamos d
             for j in range(self.len_layers-1-1): #es entre M y 2
                 index = self.len_layers - 1 - j - 1 #la ultima capa no la cuento
                 for i in range(self.layers[index]):
-                    self.perceptrons[index][i].d = self.calculate_delta(self.perceptrons[index][i].h, self.perceptrons[index][i].w, self.perceptrons[index+1], b)
+                    self.perceptrons[index][i].d = self.calculate_delta(self.perceptrons[index][i].h, self.perceptrons[index][i].w, self.perceptrons[index+1])
 
             # 6. Actualizamos pesos
             for i in range(self.len_layers-1):
@@ -211,8 +212,9 @@ class MultilayerNeuralNetwork(NeuralNetwork):
                         self.perceptrons[i][j].w[k] += delta_w
 
             # 7. calcular error
-            error = self.calculate_error(self.perceptrons, y, b)
-        print(self.perceptrons)
+            error = self.calculate_error(self.perceptrons, y, i_x)
+            cota += 1
+        # print(self.perceptrons)
 
 
     def propagate(self):
@@ -221,27 +223,26 @@ class MultilayerNeuralNetwork(NeuralNetwork):
                 i=1
             for j in range(self.layers[i]):
                 for k in range(self.layers[i-1]):
-                    self.perceptrons[i][j].v, self.perceptrons[i][j].h = self.calculate_v(self.perceptrons[i-1], j, self.b)
+                    self.perceptrons[i][j].v, self.perceptrons[i][j].h = self.calculate_v(self.perceptrons[i-1], j)
 
-    def calculate_error(self, perceptrons, y, b):
-        sum = 0
+    def calculate_error(self, perceptrons, y, i_x):
+        o = []
         last_layer = len(self.layers)-1
         for i in range(self.layers[last_layer]):
-            o = tanh(perceptrons[last_layer][i].h * b)
-            sum += (y[i] - o) ** 2
-        return 0.5 * sum
+            o.append(((y[i_x][i] - tanh(perceptrons[last_layer][i].h * self.b)) ** 2))
+        return 0.5 * sum(o)
 
-    def calculate_delta(self, h, w, layer, b):
+    def calculate_delta(self, h, w, layer):
         sum = 0
         for i in range(len(layer)):
             sum += w[i] * layer[i].d
-        return tanh_der(h, b) * sum
+        return tanh_der(h, self.b) * sum
 
-    def calculate_v(self, layer, index, b):
+    def calculate_v(self, layer, index):
         h = 0
         for i in range(len(layer)):
             h += layer[i].v * layer[i].w[index]
-        return tanh(h * b), h
+        return tanh(h * self.b), h
 
     def create_v0(self, x_i_x):
         v0 = [0] * len(x_i_x)
@@ -251,24 +252,22 @@ class MultilayerNeuralNetwork(NeuralNetwork):
 
     def calculate_h(self, w, v):
         h: float = 0
-        print(f'v: {v}')
         for j in range(len(v)):
             h += v[j].v * w[j]
         return h
 
     def get_output(self, input):
-        print('en get output')
         aux_input: np.ndarray = np.ones((len(input), len(input[0]) + 1))
         for i in range(len(input)):
             for j in range(len(input[i])):
                 aux_input[i][j + 1] = input[i][j]
         x = aux_input
-        output = []
-        for i in range(len(aux_input)):
+        output: np.ndarray = np.zeros((len(x), self.layers[self.len_layers-1]))
+        for i in range(len(x)):
             for j in range(self.layers[0]):
-                self.perceptrons[0][j].v = aux_input[i][j]
+                self.perceptrons[0][j].v = x[i][j]
             self.propagate()
-            print(self.perceptrons[self.len_layers-1])
-            output.append([self.perceptrons[self.len_layers-1][i].v])
+            for k in range(self.layers[self.len_layers-1]):
+                output[i][k] = self.perceptrons[self.len_layers - 1][k].v
         return output
 

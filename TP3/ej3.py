@@ -101,6 +101,50 @@ def ej3b(config_file: str):
     outputs = neural_network.get_output(testing_set if len(testing_set) > 0 else training_set)
     print(outputs)
 
+def ej3c(config_file: str):
+    config: Config = Config(config_file)
+    training_set: Param = config.training_set
+    if not training_set or training_set['x'] is None:
+        training_set['x'] = 'training_sets/x/ej3.tsv'
+    if not training_set or training_set['y'] is None:
+        training_set['y'] = 'training_sets/y/ej3c.tsv'
+
+    training_size = 0.8 #todo parametrizar, numero entre 0 y 1 (mayor a 0)
+
+    x: np.ndarray = get_set(training_set['x'], training_set['x_line_count'], False)
+    new_x: np.ndarray = np.ones((len(x), len(x[0]) + 1))
+    for i in range(len(x)):
+        for j in range(len(x[i])):
+            new_x[i][j + 1] = x[i][j]
+    x = new_x
+
+    y: np.ndarray = get_set(training_set['y'], training_set['y_line_count'], False)
+
+    total_inputs = len(x)
+
+    #agregamos con probabilidad 0.02 ruido a los digitos para testear
+    testing_set: np.ndarray = np.zeros((len(x), len(x[0])))
+    testing_expected: np.ndarray = np.zeros((len(y), len(y[0])))
+
+    for i in range(len(x)):
+        for j in range(len(x[i])):
+            r = random.random()
+            if r <= 0.02:
+                testing_set[i][j] = not x[i][j]
+            else:
+                testing_set[i][j] = x[i][j]
+
+    for i in range(len(y)):
+        for j in range(len(y[i])):
+            testing_expected[i][j] = (y[i][j])
+
+    neural_network: NeuralNetwork = get_neural_network(config.network, len(x[0]))()
+    neural_network.train(x, y)
+
+    print(f'testing set:\n{testing_set}')
+    print(f'testing expected output:\n{testing_expected}')
+    outputs = neural_network.get_output(testing_set if len(testing_set) > 0 else training_set)
+    print(outputs)
 
 if __name__ == '__main__':
     argv = sys.argv
@@ -111,7 +155,7 @@ if __name__ == '__main__':
 
     try:
         # ej3(config_file)
-        ej3b(config_file)
+        ej3c(config_file)
     except ValueError as e:
         print(f'Error found in {config_file}\n{e}')
 

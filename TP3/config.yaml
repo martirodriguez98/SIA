@@ -1,7 +1,7 @@
 training_set:
   x: training_sets/x/ej3.tsv
   x_line_count: 7
-  y: training_sets/y/ej3.tsv
+  y: training_sets/y/ej3c.tsv
   y_line_count: 1
 network:
   type: multilayer
