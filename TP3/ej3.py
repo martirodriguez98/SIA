@@ -144,6 +144,7 @@ def ej3c(config_file: str):
     print(f'testing set:\n{testing_set}')
     print(f'testing expected output:\n{testing_expected}')
     outputs = neural_network.get_output(testing_set if len(testing_set) > 0 else training_set)
+    print('outputs')
     print(outputs)
 
 if __name__ == '__main__':
@@ -155,6 +156,7 @@ if __name__ == '__main__':
 
     try:
         # ej3(config_file)
+        # ej3b(config_file)
         ej3c(config_file)
     except ValueError as e:
         print(f'Error found in {config_file}\n{e}')

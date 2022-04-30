@@ -8,9 +8,9 @@ import numpy as np
 from typing import Callable
 
 # chequear si la tenemos que definir nosotras o la pasan como parametro
-COTA = 500
-n = 0.3
-MIN_ERROR = 0.05
+COTA = 100000
+n = 0.1
+MIN_ERROR = 0.005
 
 
 class NeuralNetworkConfig:
@@ -156,13 +156,13 @@ class MultilayerNeuralNetwork(NeuralNetwork):
         self.perceptrons = None
         self.layers = None
         self.len_layers = 0
-        self.b = 0.9
+        self.b = 0.4
         super().__init__(config_neural)
 
     def train(self, x: np.ndarray, y: np.ndarray):
         p: int = len(y)
         #todo acordarse que la primera capa tiene que ser del tamaño de la entrada
-        self.layers: list = [len(x[0]), 4, len(y[0])]
+        self.layers: list = [len(x[0]), 3 , len(y[0])]
         error = 1
         self.len_layers = len(self.layers)
         self.perceptrons = [None] * self.len_layers
@@ -174,6 +174,8 @@ class MultilayerNeuralNetwork(NeuralNetwork):
                 if i != self.len_layers-1: #si no es la ultima capa
                     self.perceptrons[i][j].w = [0] * self.layers[i+1]
                     for w in range(self.layers[i+1]):
+                        if w == self.layers[i+1]:
+                            self.perceptrons[i][j].w[w] = 1
                         self.perceptrons[i][j].w[w] = random.random()
 
         cota = 0
@@ -181,6 +183,8 @@ class MultilayerNeuralNetwork(NeuralNetwork):
             i_x = random.randint(0, p - 1)
             # 2. aplicamos entrada a capa 0
             for j in range(self.layers[0]):
+                if j == self.layers[0] - 1: #umbral
+                    self.perceptrons[0][j].v = 1
                 self.perceptrons[0][j].v = x[i_x][j]
 
             # 3. propagamos entrada hasta a capa de salida
@@ -195,24 +199,30 @@ class MultilayerNeuralNetwork(NeuralNetwork):
             # 4. calcular d para la capa de salida
             last_index = self.len_layers-1
             for i in range(self.layers[last_index]):
-                aux = tanh_der(self.perceptrons[last_index][i].h, self.b) * (y[i_x][i] - self.perceptrons[last_index][i].v)
-                self.perceptrons[last_index][i].d = aux
+                if i != self.layers[last_index] - 1: #salteamos umbral
+                    aux = tanh_der(self.perceptrons[last_index][i].h, self.b) * (y[i_x][i] - self.perceptrons[last_index][i].v)
+                    self.perceptrons[last_index][i].d = aux
 
+            #   -   -   -   -   -
             # 5. Retropropagamos d
             for j in range(self.len_layers-1-1): #es entre M y 2
                 index = self.len_layers - 1 - j - 1 #la ultima capa no la cuento
                 for i in range(self.layers[index]):
-                    self.perceptrons[index][i].d = self.calculate_delta(self.perceptrons[index][i].h, self.perceptrons[index][i].w, self.perceptrons[index+1])
+                    if i != self.layers[index] - 1:  # salteamos umbral
+                        self.perceptrons[index][i].d = self.calculate_delta(self.perceptrons[index][i].h, self.perceptrons[index][i].w, self.perceptrons[index+1])
 
             # 6. Actualizamos pesos
-            for i in range(self.len_layers-1):
+            for i in range(self.len_layers):
                 for j in range(self.layers[i]):
-                    for k in range(self.layers[i+1]):
-                        delta_w = n * self.perceptrons[i+1][k].d * self.perceptrons[i][j].v
-                        self.perceptrons[i][j].w[k] += delta_w
+                    if j != self.layers[i] - 1 and i+1 < len(self.layers) - 1:
+                        for k in range(self.layers[i+1]):
+                            if k != self.layers[i+1] - 1 and i+1 != self.len_layers - 1:
+                                delta_w = n * self.perceptrons[i+1][k].d * self.perceptrons[i][j].v
+                                self.perceptrons[i][j].w[k] += delta_w
 
             # 7. calcular error
-            error = self.calculate_error(self.perceptrons, y, i_x)
+            error = self.calculate_error(self.perceptrons, y, x)[0]
+            print(error)
             cota += 1
         # print(self.perceptrons)
 
@@ -225,17 +235,47 @@ class MultilayerNeuralNetwork(NeuralNetwork):
                 for k in range(self.layers[i-1]):
                     self.perceptrons[i][j].v, self.perceptrons[i][j].h = self.calculate_v(self.perceptrons[i-1], j)
 
-    def calculate_error(self, perceptrons, y, i_x):
+    def calculate_error(self, perceptrons, y, x):
         o = []
-        last_layer = len(self.layers)-1
-        for i in range(self.layers[last_layer]):
-            o.append(((y[i_x][i] - tanh(perceptrons[last_layer][i].h * self.b)) ** 2))
-        return 0.5 * sum(o)
+        last_layer = self.len_layers - 1
+        for value in x:
+            o.append(self.predict(value))
+        o = np.array(o)
+        return 0.5 * sum((y - o) ** 2)
+
+    def predict(self, x):
+        layers = []
+        for i in range(self.len_layers):
+            layer = []
+            for n in range(self.layers[i]):
+                perceptron = Perceptron(None, None, None, None)
+                if i != 0 and (n != self.layers[i] - 1 or i == self.len_layers - 1):
+                    perceptron.v = 0
+                    perceptron.d = 0
+                    perceptron.h = 0
+                layer.append(perceptron)
+            layers.append(layer)
+
+        for i in range(self.layers[0]):
+            layers[0][i].v = x[i]
+
+        for m in range(1, self.len_layers-1):
+            for i in range(self.layers[m]):
+                if i != self.layers[m] - 1:
+                    for j in range(self.layers[m + 1]):
+                        if j != self.layers[m + 1] - 1:
+                            layers[m][i].h += self.perceptrons[m][i].w[j] * layers[m + 1][j].v
+                    layers[m][i].v = tanh(self.b * layers[m][i].h)
+                else:
+                    layers[m][i].v = 1
+        print(layers)
+        return list(map(lambda p: p.v, layers[-1]))
 
     def calculate_delta(self, h, w, layer):
         sum = 0
         for i in range(len(layer)):
-            sum += w[i] * layer[i].d
+            if i != len(layer) - 1:
+                sum += w[i] * layer[i].d
         return tanh_der(h, self.b) * sum
 
     def calculate_v(self, layer, index):
