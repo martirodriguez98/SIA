@@ -139,13 +139,8 @@ def ej3c(config_file: str):
             testing_expected[i][j] = (y[i][j])
 
     neural_network: NeuralNetwork = get_neural_network(config.network, len(x[0]))()
-    neural_network.train(x, y)
-
-    print(f'testing set:\n{testing_set}')
-    print(f'testing expected output:\n{testing_expected}')
-    outputs = neural_network.get_output(testing_set if len(testing_set) > 0 else training_set)
-    print('outputs')
-    print(outputs)
+    results = neural_network.train(x, y)
+    results.print()
 
 if __name__ == '__main__':
     argv = sys.argv
