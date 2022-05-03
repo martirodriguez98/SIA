@@ -30,7 +30,8 @@ def ej3(config_file: str):
     y: np.ndarray = get_set(training_set['y'], training_set['y_line_count'], False)
 
     neural_network: NeuralNetwork = get_neural_network(config.network, len(x[0]))()
-    neural_network.train(x, y)
+    results = neural_network.train(x, y)
+    results.print()
 
 def ej3b(config_file: str):
     config: Config = Config(config_file)
@@ -93,13 +94,9 @@ def ej3b(config_file: str):
     #         testing_expected.append(y[i])
 
     neural_network: NeuralNetwork = get_neural_network(config.network, len(x[0]))()
-    neural_network.train(training_set, training_expected)
+    results = neural_network.train(training_set, training_expected)
+    results.print()
 
-    print(f'training set:\n{training_set}')
-    print(f'testing set:\n{testing_set}')
-    print(f'testing expected output:\n{testing_expected}')
-    outputs = neural_network.get_output(testing_set if len(testing_set) > 0 else training_set)
-    print(outputs)
 
 def ej3c(config_file: str):
     config: Config = Config(config_file)

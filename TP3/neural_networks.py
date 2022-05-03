@@ -12,8 +12,8 @@ from numpy import random, vectorize, tanh, exp, copysign, array
 # chequear si la tenemos que definir nosotras o la pasan como parametro
 from results import Results
 
-COTA = 100000
-n = 0.1
+COTA = 1000
+n = 0.05
 MIN_ERROR = 0.005
 
 
@@ -39,22 +39,29 @@ class SimpleNeuralNetwork(NeuralNetwork):
     def train(self, x: np.ndarray, y: np.ndarray):
         p: int = len(y)
         i: int = 0
-        w = np.zeros(self.config_neural.x_count)
+        w = random.uniform(-1, 1, size=self.config_neural.x_count)
+        print(f'w: {w}')
         w_min = w
         error: float = 1
         error_min = p * 2
-        while error > 0 and i < COTA:
-            i_x = random.randint(0, p - 1)
+        while (error > 0 and i < COTA):
+            i_x = random.randint(0, p)
+            print(f'i_x: {i_x}')
             h = np.dot(x[i_x], w)
             o = np.copysign(1, h)
             delta_w = n * (y[i_x] - o) * x[i_x]
+            print(f'wa: {w}')
             w = w + delta_w
+            print(f'wd: {w}')
             error = self.calculate_error(x, y, w, p)
             # print(error)
             if error < error_min:
                 error_min = error
                 w_min = w
+            print(f'w_min: {w_min}')
+            print(f'i:{i}')
             i = i + 1
+            print(error_min)
         self.plot["x"].append(np.arange(-2, 4))
         self.plot["y"].append((-w_min[1] / w_min[2]) * np.arange(-2, 4) - w_min[0] / w_min[2])
         plot_2d(self.plot, x, y)

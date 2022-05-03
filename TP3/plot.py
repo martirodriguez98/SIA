@@ -20,8 +20,8 @@ def plot_2d(plot_info: dict, in_x: np.ndarray, in_y: np.ndarray):
             neg_values_x.append(in_x[i][1])
             neg_values_y.append(in_x[i][2])
 
-    plt.xlim(-2, 2)
-    plt.ylim(-2, 2)
+    plt.xlim(-1.5, 1.5)
+    plt.ylim(-1.5, 1.5)
     ax.scatter(pos_values_x, pos_values_y, color='red')
     ax.scatter(neg_values_x, neg_values_y, color='black')
     plt.axhline(0, color="black")
