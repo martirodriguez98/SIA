@@ -5,6 +5,7 @@ import numpy as np
 from config import Config, Param
 from config_loader import get_set, get_neural_network
 from neural_networks import NeuralNetwork
+from plot import plot_2d, plot_prediction
 
 
 def ej2(config_file: str):
@@ -25,11 +26,13 @@ def ej2(config_file: str):
             new_x[i][j + 1] = x[i][j]
     x = new_x
 
-    y: np.ndarray = get_set(training_set['y'], training_set['y_line_count'], True)
+    y: np.ndarray = get_set(training_set['y'], training_set['y_line_count'], False)
     
     neural_network: NeuralNetwork = get_neural_network(config.network, len(x[0]))()
-    neural_network.train(x, y)
-
+    results = neural_network.train(x, y)
+    results.print()
+    #plot prediction
+    plot_prediction(results)
 
 if __name__ == '__main__':
     argv = sys.argv

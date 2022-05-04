@@ -1,7 +1,8 @@
 training_set:
-  x: training_sets/x/ej1_and.tsv
+  x: training_sets/x/ej2_in.tsv
   x_line_count: 1
-  y: training_sets/y/ej1_and.tsv
+  y: training_sets/y/ej2_out.tsv
   y_line_count: 1
 network:
-  type: simple
+  type: nonlinear
+  normalize: True

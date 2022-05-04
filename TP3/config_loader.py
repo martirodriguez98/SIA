@@ -28,15 +28,14 @@ def get_set(file: str, line_count: int, normalize: bool) -> np.ndarray:
 def validate_params(params: Param) -> Param:
     return Config.validate_param(params, Schema({
         'type': And(str, Or(*tuple(_neural_networks_types.keys()))),
-        Optional('sigmoid_fn', default=None): dict,
+        Optional('normalize', default=False): bool,
     }, ignore_extra_keys=True))
 
 
 def build_network_config(network_params: Param, x_count: int) -> NeuralNetworkConfig:
     config: NeuralNetworkConfig = NeuralNetworkConfig()
     config.x_count = x_count
-    if network_params["sigmoid_fn"] is not None:
-        config.sigmoid_fn = network_params["sigmoid_fn"]
+    config.normalized = network_params['normalize']
     # todo complete with params
     return config
 

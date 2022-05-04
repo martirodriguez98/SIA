@@ -3,6 +3,8 @@ from typing import List
 import numpy as np
 import matplotlib.pyplot as plt
 
+from results import Results
+
 
 def plot_2d(plot_info: dict, in_x: np.ndarray, in_y: np.ndarray):
     fig = plt.figure()
@@ -42,4 +44,12 @@ def plot_errors(plot_info: dict, in_x: np.ndarray, in_y: np.ndarray):
     ax.set_ylabel('error')
     ax.scatter(x, plot_info["errors"], color='red')
 
+    plt.show()
+
+def plot_prediction(results: Results):
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    x_values = range(0, len(results.expected_output))
+    ax.scatter(x_values, results.expected_output, color='black')
+    ax.scatter(x_values, results.predicted_output, color='red')
     plt.show()

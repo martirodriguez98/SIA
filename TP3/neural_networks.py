@@ -12,26 +12,44 @@ from numpy import random, vectorize, tanh, exp, copysign, array
 # chequear si la tenemos que definir nosotras o la pasan como parametro
 from results import Results
 
-COTA = 1000
-n = 0.05
-MIN_ERROR = 0.005
+COTA = 10000
+n = 0.01
+MIN_ERROR = 0.00001
 
 
 class NeuralNetworkConfig:
     def __init__(self):
         self.x_count: int = 0
+        self.normalized = False
 
 
 class NeuralNetwork(ABC):
     def __init__(self, config_neural: NeuralNetworkConfig):
         self.config_neural: NeuralNetworkConfig = config_neural
         self.plot = {"x": [], "y": [], "errors": []}
+        self.time = 0
+        self.w = None
+        self.x = None
+        self.y = None
+        self.y_denormalized = None
 
     def train(self, x: np.ndarray, y: np.ndarray):
         pass
 
     def get_output(self, input):
         pass
+
+    def predict(self, x):
+        print(f'self.x: {self.x}')
+        h = x @ self.w
+        print(f'w: {self.w}')
+        print(f'h: {h}')
+        o = []
+        for e in h:
+            print(h)
+            o.append([e])
+        #todo normalized case
+        return array(o)
 
 
 class SimpleNeuralNetwork(NeuralNetwork):
@@ -76,9 +94,14 @@ class SimpleNeuralNetwork(NeuralNetwork):
 class LinearNeuralNetwork(NeuralNetwork):
 
     def train(self, x: np.ndarray, y: np.ndarray):
+        self.x = x
+        if self.config_neural.normalized:
+            self.y_denormalized = y
+            y = 2 * (y - min(y)) / (max(y) - min(y)) - 1
+        self.y = y
         p: int = len(y)
         i: int = 0
-        w = np.zeros(self.config_neural.x_count)
+        w = random.uniform(-1,1, size = self.config_neural.x_count)
         w_min = w
         error: float = 1
         error_min = p * 2
@@ -86,22 +109,29 @@ class LinearNeuralNetwork(NeuralNetwork):
         while error > 0 and i < COTA:
             i_x = random.randint(0, p - 1)
             h = np.dot(x[i_x], w)
-            o = self.activation(w, x)
+            o = self.activation(w, x[i_x])
             delta_w = n * (y[i_x] - o) * x[i_x]
             w = w + delta_w
             error = self.calculate_error(o, y, p)
             self.plot["errors"].append(error)
             if error < error_min:
+                print('entreee')
                 error_min = error
                 w_min = w
             i = i + 1
+        self.time = time.time() - self.time
+        self.w = w_min
         plot_errors(self.plot, x, y)
+        if self.config_neural.normalized:
+            return Results(self.y_denormalized, self.predict(self.x), self.time, i, error_min)
+        else:
+            return Results(self.y, self.predict(self.x), self.time, i, error_min)
 
     def activation(self, w: np.array, x: np.ndarray):
-        o: float = 0
+        o = []
         for i in range(self.config_neural.x_count):
-            o += sum(w[i] * x[i])
-        return o
+            o.append(w[i] * x[i])
+        return sum(o)
 
     def calculate_error(self, o: float, y: np.ndarray, p: int):
         aux: float = 0
@@ -112,7 +142,12 @@ class LinearNeuralNetwork(NeuralNetwork):
 
 class NonLinearNeuralNetwork(NeuralNetwork):
     def train(self, x: np.ndarray, y: np.ndarray):
-        b: float = 0.005
+        self.x = x
+        if self.config_neural.normalized:
+            self.y_denormalized = y
+            y = 2 * (y - min(y)) / (max(y) - min(y)) - 1
+        self.y = y
+        b: float = 0.001
         p: int = len(y)
         i: int = 0
         w = np.zeros(self.config_neural.x_count)
@@ -125,13 +160,19 @@ class NonLinearNeuralNetwork(NeuralNetwork):
             h = self.excitation(w, x)
             delta_w = self.calculate_delta_w(x, y, p, i_x, h, b)
             w = w + delta_w
-            error = self.calculate_error(tanh(h * b), y, p)
+            error = self.calculate_error(tanh(b, h), y, p)
             self.plot["errors"].append(error)
             if error < error_min:
                 error_min = error
                 w_min = w
             i = i + 1
-        plot_errors(self.plot, x, y)
+        self.time = time.time() - self.time
+        self.w = w_min
+        plot_errors(self.plot, self.x, self.y)
+        if self.config_neural.normalized:
+            return Results(self.y, self.predict(self.x),self.time,i,error_min)
+        else:
+            return Results(self.y, self.predict(self.x),self.time,i, error_min)
 
     def excitation(self, w: np.array, x: np.ndarray):
         o: float = 0
@@ -146,7 +187,7 @@ class NonLinearNeuralNetwork(NeuralNetwork):
         return 0.5 * aux
 
     def calculate_delta_w(self, x: np.ndarray, y: np.ndarray, p: int, i_x: int, h: float, b: float):
-        return n * ((y[i_x] - tanh(h * b)) * tanh_der(h, b) * x[i_x])
+        return n * ((y[i_x] - tanh(b, h)) * tanh_der(b, h) * x[i_x])
 
 def tanh_der(b: float, x: float) -> float:
     return b * (1 - tanh(b,x) ** 2)
