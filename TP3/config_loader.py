@@ -18,6 +18,7 @@ def get_set(file: str, line_count: int, normalize: bool) -> np.ndarray:
     if normalize:
         set = 2 * (set - min(set)) / (max(set) - min(set)) - 1
 
+
     if line_count > 1:
         elem_size = len(set[0]) * line_count
         set = np.reshape(set, (np.size(set) // elem_size, elem_size))

@@ -14,7 +14,7 @@ from results import Results
 
 COTA = 10000
 n = 0.01
-MIN_ERROR = 0.00001
+MIN_ERROR = 0.00000001
 
 
 class NeuralNetworkConfig:
@@ -40,17 +40,19 @@ class NeuralNetwork(ABC):
         pass
 
     def predict(self, x):
-        print(f'self.x: {self.x}')
         h = x @ self.w
-        print(f'w: {self.w}')
-        print(f'h: {h}')
         o = []
         for e in h:
-            print(h)
             o.append([e])
         #todo normalized case
         return array(o)
 
+    def reset_network(self):
+        self.time = 0
+        self.w = None
+        self.x = None
+        self.y = None
+        self.y_denormalized = None
 
 class SimpleNeuralNetwork(NeuralNetwork):
 
@@ -64,22 +66,16 @@ class SimpleNeuralNetwork(NeuralNetwork):
         error_min = p * 2
         while (error > 0 and i < COTA):
             i_x = random.randint(0, p)
-            print(f'i_x: {i_x}')
             h = np.dot(x[i_x], w)
             o = np.copysign(1, h)
             delta_w = n * (y[i_x] - o) * x[i_x]
-            print(f'wa: {w}')
             w = w + delta_w
-            print(f'wd: {w}')
             error = self.calculate_error(x, y, w, p)
             # print(error)
             if error < error_min:
                 error_min = error
                 w_min = w
-            print(f'w_min: {w_min}')
-            print(f'i:{i}')
             i = i + 1
-            print(error_min)
         self.plot["x"].append(np.arange(-2, 4))
         self.plot["y"].append((-w_min[1] / w_min[2]) * np.arange(-2, 4) - w_min[0] / w_min[2])
         plot_2d(self.plot, x, y)
@@ -115,7 +111,6 @@ class LinearNeuralNetwork(NeuralNetwork):
             error = self.calculate_error(o, y, p)
             self.plot["errors"].append(error)
             if error < error_min:
-                print('entreee')
                 error_min = error
                 w_min = w
             i = i + 1
@@ -170,7 +165,7 @@ class NonLinearNeuralNetwork(NeuralNetwork):
         self.w = w_min
         plot_errors(self.plot, self.x, self.y)
         if self.config_neural.normalized:
-            return Results(self.y, self.predict(self.x),self.time,i,error_min)
+            return Results(self.y_denormalized, self.predict(self.x),self.time,i,error_min)
         else:
             return Results(self.y, self.predict(self.x),self.time,i, error_min)
 
