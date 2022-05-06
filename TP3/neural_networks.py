@@ -14,7 +14,7 @@ from results import Results
 
 COTA = 10000
 n = 0.01
-MIN_ERROR = 0.00000001
+MIN_ERROR = 0.0001
 
 
 class NeuralNetworkConfig:
@@ -60,7 +60,6 @@ class SimpleNeuralNetwork(NeuralNetwork):
         p: int = len(y)
         i: int = 0
         w = random.uniform(-1, 1, size=self.config_neural.x_count)
-        print(f'w: {w}')
         w_min = w
         error: float = 1
         error_min = p * 2
@@ -256,7 +255,6 @@ class MultilayerNeuralNetwork(NeuralNetwork):
 
             error = self.calculate_error(self.x, self.y)[0]
             self.plot2['e'].append(error)
-            print(error)
             if error < error_min:
                 error_min = error
 

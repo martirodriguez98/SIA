@@ -1,12 +1,14 @@
 import math
 import random
 import sys
+from itertools import chain
 
 import numpy as np
 
 from config import Config, Param
 from config_loader import get_set, get_neural_network
 from neural_networks import NeuralNetwork
+from plot import plot_prediction
 
 
 def ej3(config_file: str):
@@ -41,8 +43,6 @@ def ej3b(config_file: str):
     if not training_set or training_set['y'] is None:
         training_set['y'] = 'training_sets/y/ej3.tsv'
 
-    training_size = 0.8 #todo parametrizar, numero entre 0 y 1 (mayor a 0)
-
     x: np.ndarray = get_set(training_set['x'], training_set['x_line_count'], False)
     new_x: np.ndarray = np.ones((len(x), len(x[0]) + 1))
     for i in range(len(x)):
@@ -52,32 +52,45 @@ def ej3b(config_file: str):
 
     y: np.ndarray = get_set(training_set['y'], training_set['y_line_count'], False)
 
-    total_inputs = len(x)
-    limit = math.ceil(total_inputs * training_size)
+    k = 5
+    items_per_k = math.ceil(len(x) / k)
+    k_x = []
+    k_y = []
+    for i in range(0,k):
+        aux_x = []
+        aux_y = []
+        for j in range(0, items_per_k):
+            r = random.randint(0, len(x) - 1)
+            aux_x.append(x[r])
+            aux_y.append(y[r])
+            x = np.delete(x, r, axis=0)
+            y = np.delete(y, r, axis=0)
+        k_x.append(aux_x)
+        k_y.append(aux_y)
 
-    training_set = []
-    testing_set = []
-    training_expected = []
-    testing_expected = []
+    r_aux = np.arange(0,k)
+    random.shuffle(r_aux)
+    for i in range(0, k):
+        testing = k_x[r_aux[i]]
+        testing_y = k_y[r_aux[i]]
+        training = []
+        training_y = []
+        for j in range(len(k_x)):
+            if j != r_aux[i]:
+                training.append(k_x[j])
+                training_y.append(k_y[j])
+        training = list(chain(*training))
+        training_y = list(chain(*training_y))
+        neural_network: NeuralNetwork = get_neural_network(config.network, len(k_x[0][0]))()
+        results = neural_network.train(training, training_y)
+        #testeamos
+        predictions = []
+        for m in range(len(testing)):
+            predictions.append(neural_network.predict(testing[m]))
+        plot_prediction(predictions, testing_y, f"Predictions for testing in iteration {i}", "Bit","Prediction")
+        neural_network.reset_network()
 
-    # entrenamos #training_size pero los elegimos de manera random
-    for i in range(limit):
-        r = random.randint(0, len(x)-1)
-        training_set.append(x[r])
-        training_expected.append(y[r])
-        x = np.delete(x, r, axis=0)
-        y = np.delete(y, r, axis=0)
 
-    for i in range(len(x)):
-        testing_set.append(x[i])
-        testing_expected.append(y[i])
-
-    #los entrenamos en orden y despues no importa lo que testeamos, devuelve par, impar, par, etc
-    # training_set = x[:limit]
-    # testing_set = x[limit:]
-
-    # training_expected = y[:limit]
-    # testing_expected = y[limit:]
 
     #entrenamos todos los pares y testeamos los impares
     # training_set = []
@@ -93,9 +106,9 @@ def ej3b(config_file: str):
     #         testing_set.append(x[i])
     #         testing_expected.append(y[i])
 
-    neural_network: NeuralNetwork = get_neural_network(config.network, len(x[0]))()
-    results = neural_network.train(training_set, training_expected)
-    results.print()
+    # neural_network: NeuralNetwork = get_neural_network(config.network, len(x[0]))()
+    # results = neural_network.train(training_set, training_expected)
+    # results.print()
 
 
 def ej3c(config_file: str):
@@ -138,6 +151,10 @@ def ej3c(config_file: str):
     neural_network: NeuralNetwork = get_neural_network(config.network, len(x[0]))()
     results = neural_network.train(x, y)
     results.print()
+    for k in range(len(testing_set)):
+        predicted = neural_network.predict(testing_set[k])
+        print(predicted)
+        plot_prediction(predicted, testing_expected[k],f"Prediction for {k}","Bit","Prediction")
 
 if __name__ == '__main__':
     argv = sys.argv
@@ -148,8 +165,8 @@ if __name__ == '__main__':
 
     try:
         # ej3(config_file)
-        # ej3b(config_file)
-        ej3c(config_file)
+        # ej3c(config_file)
+        ej3b(config_file)
     except ValueError as e:
         print(f'Error found in {config_file}\n{e}')
 

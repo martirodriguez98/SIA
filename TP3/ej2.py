@@ -60,14 +60,14 @@ def ej2b(config_file: str):
 
     #dividir x en k e ir agarrando un k de testeo y los k-1 restantes de entrenamiento
     k = 10
-    total_k = math.ceil(len(x) / k)
+    items_per_k = math.ceil(len(x) / k)
 
     k_x = []
     k_y = []
-    for i in range(0, total_k):
+    for i in range(0, k):
         aux_x = []
         aux_y = []
-        for j in range(0,k):
+        for j in range(0,items_per_k):
             r = random.randint(0, len(x) - 1)
             aux_x.append(x[r])
             aux_y.append(y[r])
@@ -92,9 +92,7 @@ def ej2b(config_file: str):
         neural_network: NeuralNetwork = get_neural_network(config.network, len(k_x[0][0]))()
         results = neural_network.train(training, training_y)
         predicted = neural_network.predict(testing)
-        print(predicted)
-        print('-------------')
-        plot_prediction(predicted, testing_y)
+        plot_prediction(predicted, testing_y, f"Prediction for {i}","Element set","Prediction")
         neural_network.reset_network()
     # results.print()
     # # plot prediction

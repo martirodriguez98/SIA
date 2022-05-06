@@ -46,10 +46,13 @@ def plot_errors(plot_info: dict, in_x: np.ndarray, in_y: np.ndarray):
 
     plt.show()
 
-def plot_prediction(predicted, expected):
+def plot_prediction(predicted, expected, title, x_label, y_label):
     fig = plt.figure()
     ax = fig.add_subplot()
     x_values = range(0, len(expected))
     ax.scatter(x_values, expected, color='black')
     ax.scatter(x_values, predicted, color='blue')
+    plt.title(title)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
     plt.show()
