@@ -1,3 +1,4 @@
+import math
 import random
 from abc import ABC
 import time
@@ -8,11 +9,10 @@ from config import Param
 import numpy as np
 from numpy import random, vectorize, tanh, exp, copysign, array
 
-
 # chequear si la tenemos que definir nosotras o la pasan como parametro
 from results import Results
 
-COTA = 10000
+COTA = 1000
 n = 0.01
 MIN_ERROR = 0.0001
 
@@ -44,7 +44,7 @@ class NeuralNetwork(ABC):
         o = []
         for e in h:
             o.append([e])
-        #todo normalized case
+        # todo normalized case
         return array(o)
 
     def reset_network(self):
@@ -53,6 +53,7 @@ class NeuralNetwork(ABC):
         self.x = None
         self.y = None
         self.y_denormalized = None
+
 
 class SimpleNeuralNetwork(NeuralNetwork):
 
@@ -96,16 +97,20 @@ class LinearNeuralNetwork(NeuralNetwork):
         self.y = y
         p: int = len(y)
         i: int = 0
-        w = random.uniform(-1,1, size = self.config_neural.x_count)
+        w = random.uniform(-1, 1, size=self.config_neural.x_count)
         w_min = w
         error: float = 1
         error_min = p * 2
 
         while error > 0 and i < COTA:
             i_x = random.randint(0, p - 1)
-            h = np.dot(x[i_x], w)
-            o = self.activation(w, x[i_x])
-            delta_w = n * (y[i_x] - o) * x[i_x]
+            h = np.dot(x, w)
+            print(h)
+            o = []
+            for val in h:
+                o.append([self.activation(w, x[i_x], val)])
+            o = array(o)
+            delta_w = n * (y[i_x] - o[i_x]) * x[i_x]
             w = w + delta_w
             error = self.calculate_error(o, y, p)
             self.plot["errors"].append(error)
@@ -121,17 +126,11 @@ class LinearNeuralNetwork(NeuralNetwork):
         else:
             return Results(self.y, self.predict(self.x), self.time, i, error_min)
 
-    def activation(self, w: np.array, x: np.ndarray):
-        o = []
-        for i in range(self.config_neural.x_count):
-            o.append(w[i] * x[i])
-        return sum(o)
+    def activation(self, w: np.array, x: np.ndarray, h):
+        return h
 
-    def calculate_error(self, o: float, y: np.ndarray, p: int):
-        aux: float = 0
-        for i in range(p):
-            aux += (y[i] - o) ** 2
-        return 0.5 * aux
+    def calculate_error(self, o: np.ndarray, y: np.ndarray, p: int):
+        return np.mean((1 / len(o)) * sum((y - o) ** 2))
 
 
 class NonLinearNeuralNetwork(NeuralNetwork):
@@ -164,9 +163,9 @@ class NonLinearNeuralNetwork(NeuralNetwork):
         self.w = w_min
         plot_errors(self.plot, self.x, self.y)
         if self.config_neural.normalized:
-            return Results(self.y_denormalized, self.predict(self.x),self.time,i,error_min)
+            return Results(self.y_denormalized, self.predict(self.x), self.time, i, error_min)
         else:
-            return Results(self.y, self.predict(self.x),self.time,i, error_min)
+            return Results(self.y, self.predict(self.x), self.time, i, error_min)
 
     def excitation(self, w: np.array, x: np.ndarray):
         o: float = 0
@@ -183,10 +182,12 @@ class NonLinearNeuralNetwork(NeuralNetwork):
     def calculate_delta_w(self, x: np.ndarray, y: np.ndarray, p: int, i_x: int, h: float, b: float):
         return n * ((y[i_x] - tanh(b, h)) * tanh_der(b, h) * x[i_x])
 
-def tanh_der(b: float, x: float) -> float:
-    return b * (1 - tanh(b,x) ** 2)
 
-def tanh(b:float, x: float) -> float:
+def tanh_der(b: float, x: float) -> float:
+    return b * (1 - tanh(b, x) ** 2)
+
+
+def tanh(b: float, x: float) -> float:
     return np.tanh(b * x)
 
 
@@ -199,6 +200,7 @@ class Perceptron:
 
     def __repr__(self):
         return f'w: {self.w}\tv: {self.v}\td: {self.d}\th: {self.h}\n'
+
 
 class MultilayerNeuralNetwork(NeuralNetwork):
     def __init__(self, config_neural: NeuralNetworkConfig):
@@ -219,7 +221,6 @@ class MultilayerNeuralNetwork(NeuralNetwork):
         self.time = 0
 
         super().__init__(config_neural)
-
 
     def train(self, x, y):
         self.x = x
@@ -351,5 +352,3 @@ class MultilayerNeuralNetwork(NeuralNetwork):
                     layers[m][i].v = 1
 
         return list(map(lambda p: p.v, layers[-1]))
-
-

@@ -35,15 +35,16 @@ def plot_2d(plot_info: dict, in_x: np.ndarray, in_y: np.ndarray):
 
 
 def plot_errors(plot_info: dict, in_x: np.ndarray, in_y: np.ndarray):
-    fig = plt.figure()
-    ax = fig.add_subplot()
+    # fig = plt.figure()
+    # ax = fig.add_subplot()
     x = []
     for i in range(len(plot_info["errors"])):
         x.append(i)
-    ax.set_xlabel('iteration')
-    ax.set_ylabel('error')
-    ax.scatter(x, plot_info["errors"], color='red')
-
+        print(f'error: {plot_info["errors"][i]}')
+    # plt.set_xlabel('iteration')
+    # plt.set_ylabel('error')
+    # plt.scatter(x, plot_info["errors"], color='red')
+    plt.plot(x,plot_info["errors"])
     plt.show()
 
 def plot_prediction(predicted, expected, title, x_label, y_label):

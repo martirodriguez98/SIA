@@ -35,7 +35,8 @@ def ej2(config_file: str):
     results = neural_network.train(x, y)
     results.print()
     #plot prediction
-    plot_prediction(results)
+    # plot_prediction(results)
+    # plot_prediction(results.predicted_output, results.expected_output, "Prediction","Element set", "Prediction")
 
 
 def ej2b(config_file: str):
@@ -106,7 +107,7 @@ if __name__ == '__main__':
         config_file = argv[1]
 
     try:
-        ej2b(config_file)
+        ej2(config_file)
 
     except ValueError as e:
         print(f'Error found in {config_file}\n{e}')
