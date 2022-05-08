@@ -12,8 +12,8 @@ from numpy import random, vectorize, tanh, exp, copysign, array
 # chequear si la tenemos que definir nosotras o la pasan como parametro
 from results import Results
 
-COTA = 1000
-n = 0.01
+COTA = 10000
+n = 0.1
 MIN_ERROR = 0.0001
 
 
@@ -140,7 +140,7 @@ class NonLinearNeuralNetwork(NeuralNetwork):
             self.y_denormalized = y
             y = 2 * (y - min(y)) / (max(y) - min(y)) - 1
         self.y = y
-        b: float = 0.001
+        b: float = 0.01
         p: int = len(y)
         i: int = 0
         w = np.zeros(self.config_neural.x_count)
@@ -150,8 +150,12 @@ class NonLinearNeuralNetwork(NeuralNetwork):
 
         while error > 0 and i < COTA:
             i_x = random.randint(0, p - 1)
-            h = self.excitation(w, x)
-            delta_w = self.calculate_delta_w(x, y, p, i_x, h, b)
+            h = np.dot(x, w)
+            o = []
+            for val in h:
+                o.append([tanh(b,val)])
+            o = array(o)
+            delta_w = self.calculate_delta_w(x, y, p, i_x, h[i_x], b)
             w = w + delta_w
             error = self.calculate_error(tanh(b, h), y, p)
             self.plot["errors"].append(error)
@@ -173,11 +177,8 @@ class NonLinearNeuralNetwork(NeuralNetwork):
             o += sum(w[i] * x[i])
         return o
 
-    def calculate_error(self, o: float, y: np.ndarray, p: int):
-        aux: float = 0
-        for i in range(p):
-            aux += (y[i] - o) ** 2
-        return 0.5 * aux
+    def calculate_error(self, o: np.ndarray, y: np.ndarray, p: int):
+        return np.mean((1 / len(o)) * sum((y - o) ** 2))
 
     def calculate_delta_w(self, x: np.ndarray, y: np.ndarray, p: int, i_x: int, h: float, b: float):
         return n * ((y[i_x] - tanh(b, h)) * tanh_der(b, h) * x[i_x])
@@ -187,7 +188,7 @@ def tanh_der(b: float, x: float) -> float:
     return b * (1 - tanh(b, x) ** 2)
 
 
-def tanh(b: float, x: float) -> float:
+def tanh(b: float, x: float):
     return np.tanh(b * x)
 
 
