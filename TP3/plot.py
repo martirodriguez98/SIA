@@ -34,18 +34,29 @@ def plot_2d(plot_info: dict, in_x: np.ndarray, in_y: np.ndarray):
     plt.show()
 
 
-def plot_errors(plot_info: dict, in_x: np.ndarray, in_y: np.ndarray):
-    # fig = plt.figure()
-    # ax = fig.add_subplot()
-    x = []
-    for i in range(len(plot_info["errors"])):
-        x.append(i)
-        print(f'error: {plot_info["errors"][i]}')
-    # plt.set_xlabel('iteration')
-    # plt.set_ylabel('error')
-    # plt.scatter(x, plot_info["errors"], color='red')
-    plt.plot(x,plot_info["errors"])
-    plt.show()
+def plot_errors(plot_info: dict, in_x: np.ndarray, in_y: np.ndarray, normalized):
+    if normalized:
+        x = []
+        for i in range(len(plot_info['e_denormalized'])):
+            x.append(i)
+        plt.plot(x, plot_info["e_denormalized"])
+        plt.title("Error denormalized")
+        plt.show()
+
+        x = []
+        for i in range(len(plot_info['e_normalized'])):
+            x.append(i)
+        plt.plot(x, plot_info["e_normalized"])
+        plt.title("Error normalized")
+        plt.show()
+
+
+    else:
+        x = []
+        for i in range(len(plot_info["errors"])):
+            x.append(i)
+        plt.plot(x,plot_info["errors"])
+        plt.show()
 
 def plot_prediction(predicted, expected, title, x_label, y_label):
     fig = plt.figure()
@@ -53,6 +64,7 @@ def plot_prediction(predicted, expected, title, x_label, y_label):
     x_values = range(0, len(expected))
     ax.scatter(x_values, expected, color='black')
     ax.scatter(x_values, predicted, color='blue')
+    plt.ylim([-1.5,1.5])
     plt.title(title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)

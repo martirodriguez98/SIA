@@ -12,9 +12,9 @@ from numpy import random, vectorize, tanh, exp, copysign, array
 # chequear si la tenemos que definir nosotras o la pasan como parametro
 from results import Results
 
-COTA = 10000
+COTA = 200
 n = 0.1
-MIN_ERROR = 0.0001
+MIN_ERROR = 0.00001
 
 
 class NeuralNetworkConfig:
@@ -26,7 +26,7 @@ class NeuralNetworkConfig:
 class NeuralNetwork(ABC):
     def __init__(self, config_neural: NeuralNetworkConfig):
         self.config_neural: NeuralNetworkConfig = config_neural
-        self.plot = {"x": [], "y": [], "errors": []}
+        self.plot = {"x": [], "y": [], "errors": [],"e_normalized": [],"e_denormalized": []}
         self.time = 0
         self.w = None
         self.x = None
@@ -54,6 +54,8 @@ class NeuralNetwork(ABC):
         self.y = None
         self.y_denormalized = None
 
+    def calculate_error(self, o: np.ndarray, y: np.ndarray):
+        pass
 
 class SimpleNeuralNetwork(NeuralNetwork):
 
@@ -120,7 +122,7 @@ class LinearNeuralNetwork(NeuralNetwork):
             i = i + 1
         self.time = time.time() - self.time
         self.w = w_min
-        plot_errors(self.plot, x, y)
+        plot_errors(self.plot, x, y, self.config_neural.normalized)
         if self.config_neural.normalized:
             return Results(self.y_denormalized, self.predict(self.x), self.time, i, error_min)
         else:
@@ -132,15 +134,15 @@ class LinearNeuralNetwork(NeuralNetwork):
     def calculate_error(self, o: np.ndarray, y: np.ndarray, p: int):
         return np.mean((1 / len(o)) * sum((y - o) ** 2))
 
-
 class NonLinearNeuralNetwork(NeuralNetwork):
     def train(self, x: np.ndarray, y: np.ndarray):
         self.x = x
         if self.config_neural.normalized:
-            self.y_denormalized = y
+            self.y_denormalized = y.copy()
             y = 2 * (y - min(y)) / (max(y) - min(y)) - 1
         self.y = y
-        b: float = 0.01
+
+        b: float = 0.001
         p: int = len(y)
         i: int = 0
         w = np.zeros(self.config_neural.x_count)
@@ -155,9 +157,15 @@ class NonLinearNeuralNetwork(NeuralNetwork):
             for val in h:
                 o.append([tanh(b,val)])
             o = array(o)
-            delta_w = self.calculate_delta_w(x, y, p, i_x, h[i_x], b)
+            delta_w = self.calculate_delta_w(x[i_x], y[i_x], o[i_x], h[i_x], b)
             w = w + delta_w
-            error = self.calculate_error(tanh(b, h), y, p)
+            error = self.calculate_error(o, y)
+
+            if self.config_neural.normalized:
+                self.plot['e_denormalized'].append(self.calculate_error(
+                    vectorize(lambda v: (v+1) * (max(self.y_denormalized) - min(self.y_denormalized)) / 2 + min(self.y_denormalized))(o),
+                    self.y_denormalized))
+                self.plot['e_normalized'].append(error)
             self.plot["errors"].append(error)
             if error < error_min:
                 error_min = error
@@ -165,7 +173,7 @@ class NonLinearNeuralNetwork(NeuralNetwork):
             i = i + 1
         self.time = time.time() - self.time
         self.w = w_min
-        plot_errors(self.plot, self.x, self.y)
+        # plot_errors(self.plot, self.x, self.y, self.config_neural.normalized)
         if self.config_neural.normalized:
             return Results(self.y_denormalized, self.predict(self.x), self.time, i, error_min)
         else:
@@ -177,11 +185,12 @@ class NonLinearNeuralNetwork(NeuralNetwork):
             o += sum(w[i] * x[i])
         return o
 
-    def calculate_error(self, o: np.ndarray, y: np.ndarray, p: int):
+    def calculate_error(self, o: np.ndarray, y: np.ndarray):
         return np.mean((1 / len(o)) * sum((y - o) ** 2))
 
-    def calculate_delta_w(self, x: np.ndarray, y: np.ndarray, p: int, i_x: int, h: float, b: float):
-        return n * ((y[i_x] - tanh(b, h)) * tanh_der(b, h) * x[i_x])
+    def calculate_delta_w(self, x: float, y: float, o: float, h: float, b: float):
+        # return n * ((y[i_x] - tanh(b, h)) * tanh_der(b, h) * x[i_x])
+        return n * (y - o) * x * tanh_der(b, h)
 
 
 def tanh_der(b: float, x: float) -> float:
@@ -215,10 +224,10 @@ class MultilayerNeuralNetwork(NeuralNetwork):
         self.plot2 = dict(
             e=[]
         )
-        self.b = 0.4
-        self.min_iter = 100000
-        self.min_error = 0.005
-        self.learning_rate = 0.1
+        self.b = 0.5
+        self.min_iter = 10000
+        self.min_error = 0.001
+        self.learning_rate = 0.01
         self.time = 0
 
         super().__init__(config_neural)
@@ -261,7 +270,6 @@ class MultilayerNeuralNetwork(NeuralNetwork):
                 error_min = error
 
             self.update_weights()
-
             i = i + 1
         self.time = time.time() - self.time
 
