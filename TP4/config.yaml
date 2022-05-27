@@ -1,3 +1,3 @@
-dataset: europe.csv
+dataset: pattern.tsv
 k: 3
-learning_rate: 0.1
+learning_rate: 0.0001

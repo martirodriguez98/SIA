@@ -22,6 +22,7 @@ def ej3(config_file: str):
         training_set['y'] = 'training_sets/y/ej1_xor.tsv'
 
     x: np.ndarray = get_set(training_set['x'], training_set['x_line_count'], False)
+    print(x)
     # agregamos un espacio para el umbral seteado en 1
     new_x: np.ndarray = np.ones((len(x), len(x[0]) + 1))
     for i in range(len(x)):
@@ -166,7 +167,7 @@ if __name__ == '__main__':
     try:
         # ej3(config_file)
         # ej3c(config_file)
-        ej3b(config_file)
+        ej3(config_file)
     except ValueError as e:
         print(f'Error found in {config_file}\n{e}')
 
