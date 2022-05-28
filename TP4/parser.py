@@ -7,7 +7,7 @@ def parse_csv(file: str):
     df = pd.read_csv(file)
     df.index = df.Country.values
     df.drop('Country',axis = 1, inplace=True)
-    return StandardScaler().fit_transform(df.values)
+    return StandardScaler().fit_transform(df.values),df.index.values
 
 def parse_letters(file: str):
     set: np.ndarray = pd.read_csv(file, delim_whitespace=True, header=None).values
