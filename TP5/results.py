@@ -13,7 +13,7 @@ class Results:
         self.predicted_output = predicted_output
         self.expected_output = expected_output
 
-    def print(self, remove_ws=False):
+    def print_results(self, remove_ws=False):
         print("\t-Expected Output:")
         if remove_ws:
             print(f'{" ".join(self.expected_output.__str__().split())}')
