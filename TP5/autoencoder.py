@@ -31,7 +31,7 @@ class Autoencoder:
         print(self.propagate(self.w_matrix(results.x),self.x[0]))
         # print(self.x[0])
 
-        return self.x,self.w[math.floor(len(self.network_layers)/2)-1]
+        return AEResults(self.iterations, self.w_matrix(results.x),results.fun)
 
     def calculate_error(self, w):
         o =[]
@@ -67,4 +67,14 @@ class Autoencoder:
         self.iterations += 1
         print(f"iteration {self.iterations}")
 
+    def encode(self, input_value, weights):
+        return self.propagate(weights[:int(len(weights) / 2)], input_value)
 
+    def decode(self, input_latent_value, weights):
+        return self.propagate(weights[int(len(weights) / 2):], input_latent_value)
+
+class AEResults:
+    def __init__(self, iterations, weights, error):
+        self.weights = weights
+        self.iterations = iterations
+        self.error = error
