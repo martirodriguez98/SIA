@@ -7,15 +7,16 @@ from scipy.optimize import minimize
 
 class Autoencoder:
 
-    def __init__(self, x, hidden_layers, latent_space, max_iter, min_error):
+    def __init__(self, x,y, hidden_layers, latent_space, max_iter, min_error):
         self.iterations = 0
         self.x = x
+        self.y = y
         self.max_iter = max_iter
         self.min_error = min_error
         self.activation_fn = lambda h: tanh(h)
         self.latent_space = latent_space
         self.hidden_layers = hidden_layers
-        self.network_layers = [len(x[0]), *hidden_layers, latent_space, *flip(hidden_layers), len(x[0])]
+        self.network_layers = [len(x[0]), *hidden_layers, latent_space, *flip(hidden_layers), len(y[0])]
         self.dimensions = []
         self.w = []
         for i in range(len(self.network_layers)-1):
@@ -39,7 +40,7 @@ class Autoencoder:
         for v in self.x:
             o.append(self.propagate(weights, v))
         o = array(o)
-        sum = npsum((self.x - o) ** 2,axis=1)
+        sum = npsum((self.y - o) ** 2,axis=1)
         return mean(sum / 2)
 
     def w_vector(self):
