@@ -46,7 +46,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.ej1a">
+  <component name="RunManager" selected="Python.ej1b">
     <configuration name="ej1a" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="TP5" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -137,8 +137,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.ej2" />
         <item itemvalue="Python.ej1b" />
+        <item itemvalue="Python.ej2" />
         <item itemvalue="Python.ej1a_new_letter" />
       </list>
     </recent_temporary>
@@ -156,7 +156,7 @@
       <workItem from="1655302669915" duration="11851000" />
       <workItem from="1655574709519" duration="15755000" />
       <workItem from="1655647598566" duration="14677000" />
-      <workItem from="1655732888244" duration="9854000" />
+      <workItem from="1655732888244" duration="13181000" />
     </task>
     <servers />
   </component>
@@ -164,9 +164,9 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/TP5$ej1a.coverage" NAME="ej1a Coverage Results" MODIFIED="1655743843416" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/TP5$ej1a.coverage" NAME="ej1a Coverage Results" MODIFIED="1655743908911" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/TP5$ej1a_new_letter.coverage" NAME="ej1a_new_letter Coverage Results" MODIFIED="1655679682690" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/exercises" />
-    <SUITE FILE_PATH="coverage/TP5$ej1b.coverage" NAME="ej1b Coverage Results" MODIFIED="1655699782441" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/exercises" />
+    <SUITE FILE_PATH="coverage/TP5$ej1b.coverage" NAME="ej1b Coverage Results" MODIFIED="1655758502321" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/exercises" />
     <SUITE FILE_PATH="coverage/TP5$ej2.coverage" NAME="ej2 Coverage Results" MODIFIED="1655743492351" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/exercises" />
   </component>
 </project>
