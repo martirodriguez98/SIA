@@ -13,7 +13,7 @@ def ej1a():
     letter_heatmap(training_set)
 
     layers = [25]
-    autoencoder = Autoencoder(training_set, layers, 2, 50, 0.001)
+    autoencoder = Autoencoder(training_set, training_set,layers, 2, 130, 0.001)
     result = autoencoder.train()
 
     decoded_values = []
